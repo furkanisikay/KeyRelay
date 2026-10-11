@@ -1,0 +1,133 @@
+<?xml version="1.0" encoding="utf-8"?>
+<root>
+  <resheader name="resmimetype"><value>text/microsoft-resx</value></resheader>
+  <resheader name="version"><value>2.0</value></resheader>
+  <resheader name="reader"><value>System.Resources.ResXResourceReader, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value></resheader>
+  <resheader name="writer"><value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value></resheader>
+  <data name="AppTitle.Text" xml:space="preserve"><value>KeyRelay</value></data>
+  <data name="NavStatus.Content" xml:space="preserve"><value>Durum</value></data>
+  <data name="NavDevices.Content" xml:space="preserve"><value>Cihazlar</value></data>
+  <data name="NavPair.Content" xml:space="preserve"><value>Eşleştir</value></data>
+  <data name="NavNetwork.Content" xml:space="preserve"><value>Ağ</value></data>
+  <data name="NavLogs.Content" xml:space="preserve"><value>Kayıtlar</value></data>
+  <data name="TrayOpen" xml:space="preserve"><value>KeyRelay'i aç</value></data>
+  <data name="TrayExit" xml:space="preserve"><value>Çıkış</value></data>
+  <data name="TrayTooltipReady" xml:space="preserve"><value>KeyRelay · tablet bağlı, tuşların buraya geliyor</value></data>
+  <data name="TrayTooltipWaiting" xml:space="preserve"><value>KeyRelay · tablet bekleniyor</value></data>
+  <data name="TrayTooltipError" xml:space="preserve"><value>KeyRelay · bu bilgisayarda çalışmıyor</value></data>
+  <data name="NoValue" xml:space="preserve"><value>–</value></data>
+  <data name="StatusTitle.Text" xml:space="preserve"><value>Durum</value></data>
+  <data name="StatusLeadRunning" xml:space="preserve"><value>KeyRelay çalışıyor · tabletten bastığın tuşlar bu bilgisayara yazılabilir</value></data>
+  <data name="StatusLeadNoAgent" xml:space="preserve"><value>KeyRelay çalışıyor · yazmaya hazırlanıyor</value></data>
+  <data name="StatusLeadUnreachable" xml:space="preserve"><value>Bu bilgisayardaki KeyRelay çalışmıyor. Bilgisayarı yeniden başlat; düzelmezse KeyRelay'i yeniden kur.</value></data>
+  <data name="HeroStateReady" xml:space="preserve"><value>BAĞLI</value></data>
+  <data name="HeroStateWaiting" xml:space="preserve"><value>BEKLİYOR</value></data>
+  <data name="HeroStateError" xml:space="preserve"><value>HATA</value></data>
+  <data name="HeroReady" xml:space="preserve"><value>Tablet bağlı</value></data>
+  <data name="HeroReadySub" xml:space="preserve"><value>{0} · bastığın tuşlar bu bilgisayara geliyor</value></data>
+  <data name="HeroWaiting" xml:space="preserve"><value>Tablet bekleniyor</value></data>
+  <data name="HeroWaitingSub" xml:space="preserve"><value>Bağlı tablet yok · tablette KeyRelay'in açık olduğundan emin ol</value></data>
+  <data name="HeroNotWritable" xml:space="preserve"><value>Tablet bağlı · şu an yazılamıyor</value></data>
+  <data name="HeroNotWritableSub" xml:space="preserve"><value>Şu an: {0} · Windows burada yazmaya izin vermiyor, ekran değişince düzelir</value></data>
+  <data name="HeroNoAgent" xml:space="preserve"><value>Yazmaya hazırlanıyor</value></data>
+  <data name="HeroNoAgentSub" xml:space="preserve"><value>KeyRelay çalışıyor, birkaç saniye içinde hazır olur</value></data>
+  <data name="HeroUnreachable" xml:space="preserve"><value>KeyRelay çalışmıyor</value></data>
+  <data name="HeroUnreachableSub" xml:space="preserve"><value>Bilgisayarı yeniden başlat; düzelmezse KeyRelay'i yeniden kur</value></data>
+  <data name="StatusNoDevice" xml:space="preserve"><value>Tablet yok</value></data>
+  <data name="LinkSecure" xml:space="preserve"><value>Şifreli · bu PC'ye kilitli</value></data>
+  <data name="LinkListening" xml:space="preserve"><value>Tablet bekleniyor</value></data>
+  <data name="LinkServiceDown" xml:space="preserve"><value>KeyRelay çalışmıyor</value></data>
+  <data name="LinkNoAgent" xml:space="preserve"><value>Yazmaya hazırlanıyor</value></data>
+  <data name="StatusLatencyLabel.Text" xml:space="preserve"><value>Gecikme · tipik / en yavaş</value></data>
+  <data name="P99Format" xml:space="preserve"><value>ms · en yavaş {0} ms</value></data>
+  <data name="StatusGraphLabel.Text" xml:space="preserve"><value>Son 1 dakika · her saniyenin en yavaş tuşu</value></data>
+  <data name="StatusTodayLabel.Text" xml:space="preserve"><value>Bugün gelen</value></data>
+  <data name="StatusKeysUnit.Text" xml:space="preserve"><value>tuş</value></data>
+  <data name="StatusRecentLabel.Text" xml:space="preserve"><value>Son tuşlar</value></data>
+  <data name="StatusShowKeys" xml:space="preserve"><value>Son tuşların adlarını göster</value></data>
+  <data name="StatusHideKeys" xml:space="preserve"><value>Son tuşların adlarını gizle</value></data>
+  <data name="StatusSessionLabel.Text" xml:space="preserve"><value>Bu bilgisayarda şu an</value></data>
+  <data name="SessionRunning" xml:space="preserve"><value>Windows oturumun açık · KeyRelay yazmaya hazır</value></data>
+  <data name="SessionNoAgent" xml:space="preserve"><value>Yazmaya hazırlanıyor</value></data>
+  <data name="DesktopWritable" xml:space="preserve"><value>Açık olan: {0} · yazılabilir</value></data>
+  <data name="DesktopNotWritable" xml:space="preserve"><value>Açık olan: {0} · şu an yazılamıyor</value></data>
+  <data name="DesktopDefault" xml:space="preserve"><value>masaüstü</value></data>
+  <data name="DesktopWinlogon" xml:space="preserve"><value>kilit ekranı ya da Windows izin penceresi</value></data>
+  <data name="DesktopScreenSaver" xml:space="preserve"><value>ekran koruyucu</value></data>
+  <data name="StatusAddressLabel.Text" xml:space="preserve"><value>Bu bilgisayarın adresi</value></data>
+  <data name="DevicesTitle.Text" xml:space="preserve"><value>Cihazlar</value></data>
+  <data name="DevicesLead.Text" xml:space="preserve"><value>Bu bilgisayara bağlanabilen tabletler. İptal ettiğin tablet hemen kopar ve bir daha bağlanamaz.</value></data>
+  <data name="DevicesAdd.Content" xml:space="preserve"><value>QR ile ekle</value></data>
+  <data name="DevicesEmpty" xml:space="preserve"><value>Henüz eşlenmiş tablet yok.</value></data>
+  <data name="DeviceConnected" xml:space="preserve"><value>bağlı</value></data>
+  <data name="DeviceConnectedDetail" xml:space="preserve"><value>bağlı · eşleşme {0:d MMM}</value></data>
+  <data name="DeviceLastSeen" xml:space="preserve"><value>eşleşme {0:d MMM} · son görülme {1:g}</value></data>
+  <data name="DevicePaired" xml:space="preserve"><value>eşleşme {0:d MMM} · henüz bağlanmadı</value></data>
+  <data name="DeviceRevoke" xml:space="preserve"><value>İptal et</value></data>
+  <data name="DeviceRevokeName" xml:space="preserve"><value>{0} cihazını iptal et</value></data>
+  <data name="RevokeTitle" xml:space="preserve"><value>Tablet iptal edilsin mi?</value></data>
+  <data name="RevokeBody" xml:space="preserve"><value>{0} bir daha bağlanamaz. Yeniden eklemek istersen QR ile eşleştir.</value></data>
+  <data name="RevokeConfirm" xml:space="preserve"><value>İptal et</value></data>
+  <data name="RevokeCancel" xml:space="preserve"><value>Vazgeç</value></data>
+  <data name="PairTitle.Text" xml:space="preserve"><value>Eşleştir</value></data>
+  <data name="PairLead" xml:space="preserve"><value>Tablette KeyRelay → PC ekle → QR'ı okut. Kod 5 dakika geçerli ve tek kullanımlık.</value></data>
+  <data name="PairVerifying" xml:space="preserve"><value>Tablet bağlanıyor · kod kontrol ediliyor…</value></data>
+  <data name="PairAddressesLabel.Text" xml:space="preserve"><value>Tabletin deneyeceği adresler</value></data>
+  <data name="PairIdentityLabel.Text" xml:space="preserve"><value>PC kimlik kodu · tablette de aynı görünmeli</value></data>
+  <data name="PairNewCodeText.Text" xml:space="preserve"><value>Yeni kod</value></data>
+  <data name="PairClose.Content" xml:space="preserve"><value>Kapat</value></data>
+  <data name="PairQrName" xml:space="preserve"><value>Eşleştirme QR kodu</value></data>
+  <data name="PairRemaining" xml:space="preserve"><value>{0:m\:ss} kaldı</value></data>
+  <data name="PairExpiredShort.Text" xml:space="preserve"><value>Süresi doldu</value></data>
+  <data name="PairExpired" xml:space="preserve"><value>Kodun süresi doldu. "Yeni kod"a bas.</value></data>
+  <data name="DevicePairedBadge" xml:space="preserve"><value>Eşlendi</value></data>
+  <data name="NetworkTitle.Text" xml:space="preserve"><value>Ağ</value></data>
+  <data name="NetworkLead.Text" xml:space="preserve"><value>Tablet aynı Wi-Fi'deyse doğrudan bağlanır; başka bir yerdeyken dışarıdan erişim gerekir.</value></data>
+  <data name="NetworkPortLabel.Text" xml:space="preserve"><value>Bağlantı noktası</value></data>
+  <data name="NetworkFunnelStateLabel.Text" xml:space="preserve"><value>Dışarıdan erişim (internet üzerinden)</value></data>
+  <data name="FunnelOn" xml:space="preserve"><value>Açık · {0}</value></data>
+  <data name="FunnelOff" xml:space="preserve"><value>Kapalı · yalnız ev/ofis ağı</value></data>
+  <data name="NetworkRouteLabel.Text" xml:space="preserve"><value>Tuşların yolu</value></data>
+  <data name="RouteTablet.Text" xml:space="preserve"><value>Tablet</value></data>
+  <data name="RouteTabletSub.Text" xml:space="preserve"><value>şifreli</value></data>
+  <data name="RoutePc.Text" xml:space="preserve"><value>Bu PC</value></data>
+  <data name="RouteFunnel" xml:space="preserve"><value>İnternet (Tailscale)</value></data>
+  <data name="RouteLocal" xml:space="preserve"><value>Ev/ofis ağı</value></data>
+  <data name="NetworkFunnelLabel.Text" xml:space="preserve"><value>İnternet adresi</value></data>
+  <data name="NetworkFunnelBox.PlaceholderText" xml:space="preserve"><value>makine.tailnet.ts.net:8443</value></data>
+  <data name="NetworkFunnelSave.Content" xml:space="preserve"><value>Kaydet</value></data>
+  <data name="NetworkFingerprintLabel.Text" xml:space="preserve"><value>Güvenlik kimliği</value></data>
+  <data name="NetworkAddressesLabel.Text" xml:space="preserve"><value>Tabletin deneyeceği adresler</value></data>
+  <data name="FunnelInvalid" xml:space="preserve"><value>İnternet adresi ad:numara biçiminde olmalı; numara 443, 8443 ya da 10000.</value></data>
+  <data name="FunnelSaved" xml:space="preserve"><value>Kaydedildi. Yeni eşleştirme kodlarında tablet önce bu adresi dener.</value></data>
+  <data name="FunnelCleared" xml:space="preserve"><value>İnternet adresi kaldırıldı. Yeni eşleştirme kodlarında yalnız ev/ofis ağı adresleri olacak.</value></data>
+  <data name="LogsTitle.Text" xml:space="preserve"><value>Kayıtlar</value></data>
+  <data name="LogsLead.Text" xml:space="preserve"><value>KeyRelay'in son 500 satırı · mavi bilgi, sarı uyarı, kırmızı hata</value></data>
+  <data name="LogsRefresh.Content" xml:space="preserve"><value>Yenile</value></data>
+  <data name="ServiceUnreachable" xml:space="preserve"><value>Bu bilgisayardaki KeyRelay çalışmıyor.</value></data>
+  <data name="WrongSession" xml:space="preserve"><value>Bunu yalnız bilgisayarın başında oturumu açık olan kullanıcı yapabilir.</value></data>
+  <data name="ServiceFailed" xml:space="preserve"><value>KeyRelay bu isteği tamamlayamadı. Ayrıntı Kayıtlar'da.</value></data>
+  <data name="InfoName" xml:space="preserve"><value>Açıklama</value></data>
+  <data name="InfoState" xml:space="preserve"><value>Tabletteki klavyenin şu an bu bilgisayara yazıp yazamadığını gösterir. Bağlı: tablette TeamViewer öndeyken bastığın tuşlar buraya gelir. Bekliyor: tablet henüz bağlanmadı; tabletin açık ve internete bağlı olduğundan emin ol, tabletteki KeyRelay bildirimine bak. Hata: bu bilgisayardaki KeyRelay çalışmıyor; bilgisayarı yeniden başlat, düzelmezse KeyRelay'i yeniden kur.</value></data>
+  <data name="InfoLatency" xml:space="preserve"><value>Bastığın tuşun bu bilgisayara ne kadar sürede ulaştığını gösterir. Tipik: çoğu tuş bu kadar sürer. En yavaş: arada bir yaşanan takılma; yazarken takılma hissediyorsan tableti modeme yaklaştır.</value></data>
+  <data name="InfoGraph" xml:space="preserve"><value>Son bir dakikada tuşların ne kadar geciktiğini gösterir. Yükselen çubuk, o saniyede bir tuşun geç geldiği anlamına gelir; düz grafik her şeyin yolunda olduğunu gösterir.</value></data>
+  <data name="InfoKeysToday" xml:space="preserve"><value>Bugün tabletten bu bilgisayara kaç tuş geldiğini gösterir. Bastıkça artıyorsa bağlantı çalışıyordur. Yalnız sayı tutulur, tuşların kendisi saklanmaz.</value></data>
+  <data name="InfoRecentKeys" xml:space="preserve"><value>Son bastığın tuşların adlarını gösterir; bir tuşun buraya ulaşıp ulaşmadığını denemek için göz düğmesiyle aç. Yalnız sen görürsün, kilit ekranında hiç tutulmaz; işin bitince kapat.</value></data>
+  <data name="InfoSession" xml:space="preserve"><value>Bu bilgisayarda şu an neyin açık olduğunu ve oraya yazılıp yazılamadığını gösterir. Yazılabilir: sorun varsa tablettedir. Şu an yazılamıyor: Windows o ekranda yazmaya izin vermiyor; kilidi açınca ya da pencere kapanınca kendiliğinden düzelir.</value></data>
+  <data name="InfoAddress" xml:space="preserve"><value>Tabletin bu bilgisayarı ağda bulduğu adres. Tablet bağlanamıyorsa Eşleştir'den yeni kodu tabletle okut; yeni kod güncel adresi taşır.</value></data>
+  <data name="InfoIdentity" xml:space="preserve"><value>Doğru bilgisayarla eşleştiğini kontrol etmen içindir. Tablette görünen kodla aynıysa onayla; farklıysa onaylama.</value></data>
+  <data name="InfoAddresses" xml:space="preserve"><value>Tabletin bu bilgisayara ulaşmak için sırayla deneyeceği adresler. Eşleştirme takılıyorsa tablet ile bilgisayarın aynı Wi-Fi'de olduğundan emin ol ya da Ağ sayfasından dışarıdan erişimi aç.</value></data>
+  <data name="InfoCountdown" xml:space="preserve"><value>Kodun ne kadar daha geçerli olduğunu gösterir. Süre dolduysa "Yeni kod"a bas; eski kod artık çalışmaz.</value></data>
+  <data name="InfoPort" xml:space="preserve"><value>Tabletin bu bilgisayara bağlandığı numara. Genelde dokunman gerekmez; bir güvenlik duvarı tableti engelliyorsa izin vermen gereken numara budur.</value></data>
+  <data name="InfoFunnel" xml:space="preserve"><value>Kafede ya da evden uzaktayken tabletin bu bilgisayara bağlanabilmesi için. Kapalıysa tablet yalnız aynı Wi-Fi'deyken bağlanır. Tailscale Funnel ile kurulur; verdiği adresi aşağıdaki "İnternet adresi"ne yaz.</value></data>
+  <data name="InfoFingerprint" xml:space="preserve"><value>Tabletin yalnız bu bilgisayara bağlanmasını sağlayan kimlik; başka bir bilgisayar araya giremez. Normalde bakman gerekmez; destek istersen bu değeri paylaşabilirsin.</value></data>
+  <data name="InfoRoute" xml:space="preserve"><value>Tuşlarının tabletten bu bilgisayara hangi yoldan geldiğini gösterir: ev/ofis ağı ya da internet. Yol hangisi olursa olsun bağlantı şifrelidir.</value></data>
+  <data name="InfoFunnelAddress" xml:space="preserve"><value>Dışarıdan erişim için Tailscale'in verdiği adres (ad:numara). Buraya yazıp kaydedersen yeni eşleştirme kodları bu adresi de taşır; boş bırakıp kaydedersen dışarıdan erişim kapanır.</value></data>
+  <data name="InfoQrAddresses" xml:space="preserve"><value>Yeni eşleştirme kodunun tablete vereceği adresler. Tablet bağlanamıyorsa listede tabletin ulaşabileceği bir adres olduğundan emin ol.</value></data>
+  <data name="InfoLogs" xml:space="preserve"><value>Bir şey ters gittiğinde ne olduğunu gösterir: mavi bilgi, sarı uyarı, kırmızı hata. Destek istersen son satırları kopyalayıp gönder; metinler İngilizcedir.</value></data>
+  <data name="IntroTitle.Text" xml:space="preserve"><value>Nasıl çalışır?</value></data>
+  <data name="IntroBody.Text" xml:space="preserve"><value>Tabletteki klavyede bastığın tuşlar şifreli bağlantıyla bu bilgisayara gelir ve yazılır. Başlamak için Eşleştir'deki QR kodunu tabletle okut. Bir alanın ne işe yaradığını merak edersen yanındaki ⓘ işaretine tıkla.</value></data>
+  <data name="IntroClose.Content" xml:space="preserve"><value>Anladım</value></data>
+  <data name="DevicesSetAside.Title" xml:space="preserve"><value>Tablet listesi okunamadı</value></data>
+  <data name="DevicesSetAside.Message" xml:space="preserve"><value>Bozuk liste ProgramData\KeyRelay altına yedeklendi ve liste boş başladı. Tabletlerini yeniden eşleştir.</value></data>
+</root>

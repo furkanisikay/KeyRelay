@@ -1,0 +1,46 @@
+<Page
+    x:Class="KeyRelay.Tray.Pages.LogsPage"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:local="using:KeyRelay.Tray.Pages"
+    xmlns:tray="using:KeyRelay.Tray">
+    <Grid>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="*" />
+        </Grid.RowDefinitions>
+        <TextBlock x:Name="LogsTitle" x:Uid="LogsTitle" Style="{StaticResource PageTitleStyle}" />
+        <Grid Grid.Row="1">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition />
+                <ColumnDefinition Width="Auto" />
+            </Grid.ColumnDefinitions>
+            <StackPanel Orientation="Horizontal" Spacing="4">
+                <TextBlock x:Uid="LogsLead" Style="{StaticResource LeadStyle}" VerticalAlignment="Center" TextWrapping="Wrap" MaxWidth="560" />
+                <tray:InfoTip TextKey="InfoLogs" />
+            </StackPanel>
+            <Button x:Uid="LogsRefresh" AutomationProperties.AutomationId="LogsRefresh" Grid.Column="1" VerticalAlignment="Top" Click="OnRefresh" />
+        </Grid>
+        <Border Grid.Row="2" Style="{StaticResource CardStyle}" Padding="6,8">
+            <ListView x:Name="Lines" SelectionMode="None" FontFamily="{StaticResource NumberFont}" FontSize="12.5" AutomationProperties.LabeledBy="{x:Bind LogsTitle}">
+                <ListView.ItemContainerStyle>
+                    <Style TargetType="ListViewItem" BasedOn="{StaticResource DefaultListViewItemStyle}">
+                        <Setter Property="MinHeight" Value="24" />
+                        <Setter Property="Padding" Value="10,0" />
+                    </Style>
+                </ListView.ItemContainerStyle>
+                <ListView.ItemTemplate>
+                    <!-- Selectable text so a line can be copied into a bug report. -->
+                    <DataTemplate x:DataType="local:LogLine">
+                        <TextBlock TextWrapping="Wrap" IsTextSelectionEnabled="True" LineHeight="24" Foreground="{ThemeResource MutedBrush}">
+                            <Run Text="{x:Bind Time}" Foreground="{ThemeResource FaintBrush}" />
+                            <Run Text="{x:Bind Tag}" FontWeight="Bold" Foreground="{x:Bind TagBrush}" />
+                            <Run Text="{x:Bind Text}" />
+                        </TextBlock>
+                    </DataTemplate>
+                </ListView.ItemTemplate>
+            </ListView>
+        </Border>
+    </Grid>
+</Page>

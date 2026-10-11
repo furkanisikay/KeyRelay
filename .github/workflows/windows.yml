@@ -1,0 +1,13 @@
+name: windows
+on:
+  push: { paths: ["windows/**", "protocol/**", ".editorconfig", ".github/workflows/windows.yml"] }
+  pull_request: { paths: ["windows/**", "protocol/**", ".editorconfig", ".github/workflows/windows.yml"] }
+jobs:
+  build:
+    runs-on: windows-latest
+    defaults: { run: { working-directory: windows } }
+    steps:
+      - uses: actions/checkout@v7
+      - uses: actions/setup-dotnet@v6
+        with: { global-json-file: windows/global.json }
+      - run: dotnet test KeyRelay.slnx -c Release

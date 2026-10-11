@@ -1,0 +1,10 @@
+<Solution>
+  <Folder Name="/src/">
+    <Project Path="src/KeyRelay.Protocol/KeyRelay.Protocol.csproj" />
+    <Project Path="src/KeyRelay.Service/KeyRelay.Service.csproj" />
+    <Project Path="src/KeyRelay.Tray/KeyRelay.Tray.csproj" />
+  </Folder>
+  <Folder Name="/tests/">
+    <Project Path="tests/KeyRelay.Tests/KeyRelay.Tests.csproj" />
+  </Folder>
+</Solution>

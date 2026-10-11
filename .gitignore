@@ -1,0 +1,27 @@
+# Android / Gradle
+android/.gradle/
+android/**/build/
+android/local.properties
+android/.idea/
+android/**/.cxx/
+android/.kotlin/
+*.apk
+*.aab
+# .NET
+windows/**/bin/
+windows/**/obj/
+windows/**/TestResults/
+*.user
+.vs/
+# Release output
+artifacts/
+*.exe
+*.msi
+# Signing keys
+*.pfx
+*.jks
+*.keystore
+*.p12
+# Local
+.superpowers/
+.claude/

@@ -1,0 +1,45 @@
+name: Hata bildirimi
+description: KeyRelay'de beklenmeyen bir davranışı bildirin
+labels: [bug]
+body:
+  - type: input
+    id: tablet
+    attributes:
+      label: Tablet modeli
+  - type: input
+    id: android
+    attributes:
+      label: Android sürümü
+    validations:
+      required: true
+  - type: input
+    id: keyboard
+    attributes:
+      label: Klavye modeli
+  - type: input
+    id: windows
+    attributes:
+      label: Windows sürümü
+    validations:
+      required: true
+  - type: input
+    id: remote-desktop
+    attributes:
+      label: Uzak masaüstü uygulaması
+  - type: textarea
+    id: expected
+    attributes:
+      label: Beklenen davranış
+    validations:
+      required: true
+  - type: textarea
+    id: actual
+    attributes:
+      label: Olan davranış
+    validations:
+      required: true
+  - type: textarea
+    id: log
+    attributes:
+      label: KeyRelay logu
+      render: text

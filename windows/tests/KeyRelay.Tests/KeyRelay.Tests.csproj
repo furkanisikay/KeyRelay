@@ -1,0 +1,10 @@
+<Project Sdk="MSTest.Sdk">
+  <PropertyGroup>
+    <TargetFramework>net10.0-windows</TargetFramework>
+  </PropertyGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\..\src\KeyRelay.Service\KeyRelay.Service.csproj" />
+    <ProjectReference Include="..\..\src\KeyRelay.Protocol\KeyRelay.Protocol.csproj" />
+    <None Include="..\..\..\protocol\test-vectors\frames.json" Link="frames.json" CopyToOutputDirectory="PreserveNewest" />
+  </ItemGroup>
+</Project>

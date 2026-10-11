@@ -1,0 +1,1389 @@
+<!doctype html>
+<html lang="tr" data-theme="dark">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>KeyRelay · Arayüz taslakları</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&family=JetBrains+Mono:wght@500;700;800&display=swap" rel="stylesheet">
+<style>
+@property --a1{syntax:'<color>';inherits:true;initial-value:#3B6CFF}
+@property --a2{syntax:'<color>';inherits:true;initial-value:#22D3EE}
+@property --a3{syntax:'<color>';inherits:true;initial-value:#7A5CFF}
+:root{
+  --bg:#05080F;--bg-2:#0B111C;--node:#111A29;--glass:rgba(17,26,44,.58);--glass-2:rgba(255,255,255,.06);--glass-line:rgba(255,255,255,.10);
+  --text:#EEF3FF;--muted:#9AA8C0;--faint:#5E6C8C;--accent:#4C7DFF;--accent-2:#89A8FF;--ok:#2FD49C;--warn:#F2B544;--err:#FF6B6B;
+  --cap-top:#F2F6FF;--cap-l:#9FB4FF;--cap-r:#6F8BEA;--cap-ink:#1E3A8F;--flow:#fff;
+  --mica:#121722;--acr:rgba(30,37,54,.62);--acr-2:rgba(38,46,66,.86);
+  --aur-o:.9;--grain-o:.11;--bezel:linear-gradient(145deg,#232B3B,#090C13);
+  --spring:cubic-bezier(.2,1.5,.35,1);--ease:cubic-bezier(.2,.8,.2,1);
+}
+html[data-theme=light]{
+  --bg:#E9EEF8;--bg-2:#F7F9FD;--node:#FFFFFF;--glass:rgba(255,255,255,.66);--glass-2:rgba(11,17,28,.05);--glass-line:rgba(11,17,28,.10);
+  --text:#0B1222;--muted:#4D5A73;--faint:#8A97B0;--accent:#2F5BEA;--accent-2:#2A4FC9;
+  --cap-top:#FFFFFF;--cap-l:#C3D1FF;--cap-r:#9DB2F2;--flow:#0B1222;
+  --mica:#EEF1F7;--acr:rgba(255,255,255,.66);--acr-2:rgba(250,251,254,.92);
+  --aur-o:.6;--grain-o:.07;color-scheme:light
+}
+html{color-scheme:dark;scroll-behavior:smooth}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--text);font:500 15px/1.5 Manrope,system-ui,sans-serif;overflow-x:hidden;transition:background .4s,color .4s}
+button{font:inherit;color:inherit}
+.mono{font-family:"JetBrains Mono",ui-monospace,monospace;font-variant-numeric:tabular-nums}
+[hidden]{display:none!important}
+
+/* ---------- state palette (aurora colours glide via @property) ---------- */
+.st{transition:--a1 .4s var(--ease),--a2 .4s var(--ease),--a3 .4s var(--ease)}
+.st,[data-s=relay]{--a1:#3B6CFF;--a2:#22D3EE;--a3:#7A5CFF}
+[data-s=ready]{--a1:#19C98C;--a2:#3EE6C1;--a3:#0EA5A5}
+[data-s=connecting]{--a1:#F2B544;--a2:#FF8A3D;--a3:#FFD66B}
+[data-s=error]{--a1:#FF5468;--a2:#FF8A65;--a3:#B3264A}
+
+/* static mesh background: colours change only when the state changes (0.4 s) */
+.aurora{position:absolute;inset:0;overflow:hidden;pointer-events:none;opacity:var(--aur-o);border-radius:inherit;z-index:0}
+.aurora::before,.aurora::after{content:"";position:absolute;inset:-20%;
+  background:radial-gradient(34% 40% at 22% 30%,color-mix(in oklab,var(--a1) 75%,transparent),transparent 70%),
+    radial-gradient(30% 34% at 78% 62%,color-mix(in oklab,var(--a2) 55%,transparent),transparent 70%),
+    radial-gradient(40% 30% at 50% 96%,color-mix(in oklab,var(--a3) 55%,transparent),transparent 72%)}
+.aurora::after{transform:rotate(180deg);opacity:.4;mix-blend-mode:screen}
+html[data-theme=light] .aurora::after{mix-blend-mode:normal;opacity:.3}
+.grain::after{content:"";position:absolute;inset:0;pointer-events:none;border-radius:inherit;z-index:1;opacity:var(--grain-o);mix-blend-mode:overlay;
+  background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='180' height='180'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.85' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E")}
+.bgfx{position:fixed;inset:0;z-index:-1;pointer-events:none}
+.bgfx .aurora{opacity:calc(var(--aur-o)*.45)}
+
+/* ---------- logo: isometric keycap ---------- */
+.logo{display:block;overflow:visible}
+.lg-l{fill:var(--cap-l)}.lg-r{fill:var(--cap-r)}.lg-f{fill:var(--cap-top)}
+.lg-a{fill:none;stroke:var(--cap-ink);stroke-width:2.6;stroke-linecap:round;stroke-linejoin:round}
+.lg-ring{fill:none;stroke:var(--a2);stroke-width:1.6;opacity:.35;transform-box:fill-box;transform-origin:center}
+.lg-top{transition:transform .25s var(--spring)}
+[data-logo]:active .lg-top{transform:translateY(6px)}
+.logo.mono .lg-l,.logo.mono .lg-r,.logo.mono .lg-f{fill:none;stroke:#1E3A8F;stroke-width:2.2;stroke-linejoin:round}
+.logo.mono .lg-a{stroke:#1E3A8F}.logo.mono .lg-ring{display:none}
+
+/* ---------- page chrome ---------- */
+.mast{position:relative;overflow:hidden;padding:20px 28px 0;min-height:760px}
+.mast>.aurora{opacity:calc(var(--aur-o)*.8)}
+.topnav{position:relative;z-index:2;max-width:1520px;margin:0 auto;display:flex;align-items:center;gap:14px}
+.topnav .nm{font:800 20px Manrope;letter-spacing:-.04em}
+.topnav a{color:var(--muted);text-decoration:none;font-weight:700;font-size:14px;padding:8px 10px;border-radius:999px}
+.topnav a:hover{color:var(--text);background:var(--glass-2)}
+.topnav .sp{flex:1}
+.mast-grid{position:relative;z-index:2;max-width:1520px;margin:0 auto;display:grid;grid-template-columns:1.4fr 1fr;gap:20px;align-items:center;padding-top:60px}
+.eyebrow{font:700 12px "JetBrains Mono";letter-spacing:.2em;text-transform:uppercase;color:var(--muted);margin:0}
+h1{font:800 clamp(56px,8.4vw,136px)/.86 Manrope;letter-spacing:-.065em;margin:18px 0 22px}
+.shine{background:linear-gradient(90deg,var(--a2),var(--a1) 50%,var(--a3));-webkit-background-clip:text;background-clip:text;color:transparent}
+.keybtn{margin-top:26px;display:flex;gap:12px;align-items:center;flex-wrap:wrap;color:var(--muted);font-size:13px}
+.strip{display:flex;gap:6px;align-items:center;flex-wrap:wrap}
+.strip .kcap{min-width:34px;height:28px;font-size:11px}
+.lede{max-width:640px;color:var(--muted);font-size:16px;line-height:1.6;margin:0}
+.stats{display:flex;gap:34px;margin-top:30px;flex-wrap:wrap}
+.stats b{display:block;font:800 40px/1 "JetBrains Mono";letter-spacing:-.05em}
+.stats span{font-size:12px;color:var(--muted);font-weight:700;letter-spacing:.08em;text-transform:uppercase}
+.mast-logo{display:grid;place-items:center;position:relative}
+.mast-logo::before{content:"";position:absolute;width:420px;height:420px;border-radius:50%;background:radial-gradient(closest-side,color-mix(in oklab,var(--a1) 55%,transparent),transparent);filter:blur(10px)}
+.logo-xl{width:300px;position:relative}
+.mast-arc{position:relative;z-index:1;max-width:1520px;margin:-40px auto 0}
+.seg{display:inline-flex;padding:4px;border-radius:999px;background:var(--glass);border:1px solid var(--glass-line);gap:2px;backdrop-filter:blur(14px)}
+.seg button{height:36px;padding:0 15px;border-radius:999px;border:0;background:transparent;color:var(--muted);font:700 13px Manrope;cursor:pointer;display:inline-flex;align-items:center;gap:8px;transition:background .3s,color .3s,transform .35s var(--spring)}
+.seg button:active{transform:scale(.94)}
+.seg button[aria-pressed=true]{background:var(--text);color:var(--bg)}
+.seg i{width:9px;height:9px;border-radius:50%;flex:none}
+section{max-width:1520px;margin:0 auto;padding:90px 28px 30px;position:relative}
+.shead{display:flex;align-items:flex-end;gap:24px;margin-bottom:40px;flex-wrap:wrap}
+.shead .no{font:800 110px/.78 "JetBrains Mono";letter-spacing:-.08em;color:transparent;-webkit-text-stroke:1.5px color-mix(in oklab,var(--text) 30%,transparent)}
+.shead h2{font:800 clamp(40px,5vw,72px)/.9 Manrope;letter-spacing:-.06em;margin:0}
+.shead p{color:var(--muted);max-width:620px;margin:10px 0 0}
+.row{display:flex;flex-wrap:wrap;gap:44px;align-items:flex-start}
+.devwrap{max-width:100%;overflow-x:auto;padding:10px 4px 4px}
+.label{font-size:13px;color:var(--muted);margin:14px 0 0;text-align:center;font-weight:600}
+.ctl{display:flex;justify-content:center;gap:10px;margin-top:16px;flex-wrap:wrap}
+
+/* ---------- brand ---------- */
+.brand{display:grid;grid-template-columns:repeat(12,1fr);gap:18px}
+.card{position:relative;overflow:hidden;background:var(--glass);border:1px solid var(--glass-line);border-radius:32px;padding:26px;backdrop-filter:blur(16px)}
+.card h3{margin:0 0 18px;font:800 13px Manrope;letter-spacing:.16em;text-transform:uppercase;color:var(--muted)}
+.c-logo{grid-column:span 5;min-height:380px}.c-col{grid-column:span 7}.c-type{grid-column:span 7}.c-mot{grid-column:span 5}
+.icons{display:flex;gap:26px;align-items:center;flex-wrap:wrap;margin-top:22px}
+.icon{width:104px;height:104px;border-radius:30px;display:grid;place-items:center;position:relative;flex:none}
+.icon .logo{width:64px}
+.icon.adaptive{background:radial-gradient(120% 120% at 20% 10%,#2A4FC9 0%,#14245E 55%,#0B1433 100%);box-shadow:0 20px 40px -14px #2A4FC9}
+.icon.round{border-radius:50%;background:radial-gradient(120% 120% at 20% 10%,#2A4FC9 0%,#14245E 60%)}
+.icon.themed{background:#DCE4FF;border-radius:50%}
+.icon small{position:absolute;bottom:-24px;font-size:11px;color:var(--muted);white-space:nowrap;font-weight:600}
+.bigmark{width:190px;margin:0 auto}
+.swatches{display:grid;grid-template-columns:repeat(4,1fr);gap:10px}
+.sw{height:84px;border-radius:20px;display:flex;flex-direction:column;justify-content:flex-end;padding:10px 12px;font-size:12px;font-weight:800;position:relative;overflow:hidden;transition:transform .3s var(--spring),border-radius .3s var(--spring)}
+.sw:hover{transform:translateY(-4px) rotate(-1deg);border-radius:30px}
+.sw span{font:500 10px "JetBrains Mono";opacity:.75}
+.orbs{display:flex;gap:12px;margin-top:16px}
+.orb{flex:1;height:70px;border-radius:999px;position:relative;overflow:hidden;display:grid;place-items:center;font:800 12px Manrope;color:#fff;text-shadow:0 1px 8px rgba(0,0,0,.4)}
+.orb .aurora{opacity:1}
+.orb b{position:relative;z-index:2}
+.type .big{font:800 clamp(48px,5.4vw,84px)/.9 Manrope;letter-spacing:-.065em}
+.type .mid{font:700 18px Manrope;margin-top:16px}
+.type .body{font-size:14px;color:var(--muted);margin-top:6px;line-height:1.55}
+.type .nums{display:flex;gap:26px;margin-top:20px;align-items:baseline;flex-wrap:wrap}
+.type .nums b{font:800 54px/1 "JetBrains Mono";letter-spacing:-.06em}
+.morph-row{display:flex;gap:18px;align-items:center;margin:8px 0 18px}
+.morph-row .morph{width:84px;height:84px}
+.mot-list{margin:0;padding:0;list-style:none;font-size:14px;color:var(--muted)}
+.mot-list li{padding:7px 0;border-top:1px solid var(--glass-line)}
+.mot-list b{color:var(--text)}
+
+/* ---------- shared atoms ---------- */
+.morph{position:relative;width:54px;height:54px;flex:none}
+.m-shape{position:absolute;inset:0;background:conic-gradient(from 210deg,var(--a1),var(--a2),var(--a3),var(--a1));transition:clip-path .4s var(--spring);
+  filter:drop-shadow(0 6px 18px color-mix(in oklab,var(--a1) 60%,transparent))}
+.m-glyph{position:absolute;inset:0;display:grid;place-items:center;color:#fff}
+.m-glyph svg{width:46%;height:46%}
+@keyframes spin{to{transform:rotate(360deg)}}
+.chips{display:flex;gap:8px;flex-wrap:wrap}
+.chip{display:inline-flex;align-items:center;gap:8px;height:34px;padding:0 14px;border-radius:999px;background:var(--glass-2);border:1px solid var(--glass-line);font:700 13px Manrope;white-space:nowrap}
+.dot{width:9px;height:9px;border-radius:50%;background:var(--ok);flex:none;position:relative;box-shadow:0 0 10px var(--ok)}
+.dot.warn{background:var(--warn);box-shadow:0 0 10px var(--warn)}.dot.err{background:var(--err);box-shadow:0 0 10px var(--err)}
+.dot.off{background:var(--faint);box-shadow:none}
+.dot.live::after{content:"";position:absolute;inset:-5px;border-radius:50%;border:2px solid color-mix(in oklab,var(--ok) 45%,transparent)}
+.kic{width:34px;height:34px;border-radius:11px;display:inline-grid;place-items:center;flex:none;color:var(--a1);background:color-mix(in oklab,var(--a1) 16%,transparent);box-shadow:inset 0 0 0 1px color-mix(in oklab,var(--a1) 30%,transparent);margin-bottom:8px}
+.kic svg{width:18px;height:18px}
+.khead{display:flex;align-items:center;gap:10px}.khead .kic{margin:0}
+.kcap{display:inline-grid;place-items:center;min-width:42px;height:36px;padding:0 10px;border-radius:9px;background:linear-gradient(180deg,var(--cap-top),color-mix(in oklab,var(--cap-top) 86%,var(--cap-l)));color:var(--cap-ink);
+  font:800 13px "JetBrains Mono";box-shadow:0 4px 0 var(--cap-l),0 8px 18px -6px rgba(0,0,0,.45);transform:translateY(-2px);vertical-align:middle}
+.kcaps{display:flex;gap:8px;margin-top:12px}
+.kcap{transition:transform .15s var(--spring),box-shadow .15s}
+.kcap:active,.kcap.hit{transform:translateY(2px);box-shadow:0 0 0 var(--cap-l),0 0 18px -2px var(--a2)}
+.press{transition:transform .3s var(--spring),border-radius .3s var(--spring),filter .2s}
+.press:active{transform:scale(.95)}
+.stag>*{animation:rise .38s var(--spring) both;animation-delay:calc(var(--i,0)*50ms);animation-play-state:paused}
+.stag.in>*{animation-play-state:running}
+@keyframes rise{from{opacity:0;transform:translateY(16px) scale(.98)}to{opacity:1;transform:none}}
+.cells{display:flex;gap:6px;align-items:center}
+.cells span{width:34px;height:44px;border-radius:10px;display:grid;place-items:center;background:var(--glass-2);border:1px solid var(--glass-line);font:800 20px "JetBrains Mono";color:var(--accent-2);transition:background .3s,color .3s}
+.cells span.dash{width:12px;background:none;border:0;color:var(--muted)}
+.cells span.lock{animation:lock .3s var(--spring)}
+@keyframes lock{0%{transform:scale(1.25);background:color-mix(in oklab,var(--a1) 45%,transparent);color:#fff}100%{transform:none}}
+
+/* ---------- relay arc ---------- */
+.arc{display:block;width:100%;height:auto;overflow:visible}
+.a-halo,.a-core{fill:none;stroke-linecap:round;stroke-dasharray:50 0 50 0;transition:stroke-dasharray .4s var(--spring),opacity .4s}
+.a-halo{stroke-width:18;opacity:.55}.a-core{stroke-width:3.2}
+.a-flow{fill:none;stroke:var(--flow);stroke-width:3.2;stroke-linecap:round;stroke-dasharray:.25 2.25;opacity:.8;transition:opacity .4s}
+.a-node .a-bg{fill:var(--node);stroke:var(--glass-line);stroke-width:1.5}
+.a-node .a-ic{color:var(--text)}
+.a-body{transform-box:fill-box;transform-origin:center}
+.a-ring{fill:none;stroke:var(--a1);stroke-width:2.5;opacity:0;transition:opacity .4s}
+[data-s=relay] .a-dst .a-ring,[data-s=connecting] .a-src .a-ring{opacity:.55}
+[data-s=ready] .a-flow,[data-s=connecting] .a-flow,[data-s=error] .a-flow{opacity:0}
+[data-s=ready] .a-halo{opacity:.25}
+[data-s=connecting] .a-core{stroke-dasharray:1.6 2.4 1.6 2.4}
+[data-s=connecting] .a-halo{opacity:.2}
+[data-s=error] .a-core,[data-s=error] .a-halo{stroke-dasharray:41 18 41 0}
+[data-s=error] .a-dst{opacity:.45}
+.a-x{opacity:0;transition:opacity .4s}[data-s=error] .a-x,[data-s=connecting] .a-q{opacity:1}
+.a-x circle{fill:var(--err)}.a-x path{stroke:#fff;stroke-width:2.6;stroke-linecap:round}
+.a-q{opacity:0;transition:opacity .4s}.a-q circle{fill:var(--warn)}.a-q path{stroke:#2B1E00;stroke-width:2.6;stroke-linecap:round}
+.a-park{opacity:0;transition:opacity .4s}[data-s=ready] .a-park{opacity:1}
+.a-still{transition:opacity .4s}[data-s=ready] .a-still,[data-s=connecting] .a-still,[data-s=error] .a-still{opacity:0}
+.kc-t{fill:var(--cap-top)}.kc-s{fill:var(--cap-l)}
+.kc-g{font:800 12px "JetBrains Mono";fill:var(--cap-ink);text-anchor:middle;dominant-baseline:middle}
+.kc{filter:drop-shadow(0 0 7px var(--a2))}
+.kc-trail{fill:none;stroke:var(--a2);stroke-width:5;stroke-linecap:round;opacity:.65}
+.b-ring{fill:none;stroke:var(--a2);stroke-width:3;transform-box:fill-box;transform-origin:center}
+.b-spark{stroke:var(--a2);stroke-width:2.6;stroke-linecap:round}
+
+/* ---------- wave chart ---------- */
+.wave{display:block;width:100%;height:auto;overflow:hidden;margin-top:8px}
+.w-line{fill:none;stroke:var(--a2);stroke-width:2.4;stroke-linejoin:round;filter:drop-shadow(0 0 5px var(--a2))}
+.w-p{stroke:var(--muted);stroke-width:1;stroke-dasharray:3 4;opacity:.7}
+.w-pt{font:700 9px "JetBrains Mono";fill:var(--muted)}
+.w-now{fill:var(--a2);stroke:var(--bg-2);stroke-width:2}
+
+/* ---------- device frames ---------- */
+.tablet{width:1000px;height:640px;border-radius:46px;padding:14px;background:var(--bezel);flex:none;
+  box-shadow:inset 0 0 0 1px rgba(255,255,255,.07),0 50px 110px -30px rgba(0,0,0,.6),0 0 160px -60px var(--a1)}
+.tablet.portrait{width:430px;height:780px}
+.screen{position:relative;height:100%;border-radius:33px;overflow:hidden;background:var(--bg-2);isolation:isolate}
+.screen>.aurora{opacity:calc(var(--aur-o)*.55)}
+.layer{position:relative;z-index:2;height:100%}
+.cam{position:absolute;top:50%;left:5px;width:5px;height:5px;border-radius:50%;background:#000;box-shadow:0 0 0 1.5px #1c2333}
+.portrait .cam{top:5px;left:50%}
+
+/* android status (landscape) */
+.ascreen{display:grid;grid-template-rows:auto 1fr;gap:16px;padding:24px 26px}
+.appbar{display:flex;align-items:center;gap:12px}
+.appbar .ttl{font:800 26px Manrope;letter-spacing:-.05em}
+.appbar .logo{width:34px}
+.appbar .sp{flex:1}
+.ibtn{width:48px;height:48px;border-radius:16px;display:grid;place-items:center;background:var(--glass);border:1px solid var(--glass-line);cursor:pointer}
+.ibtn:active{border-radius:24px;transform:scale(.94)}
+.stgrid{display:grid;grid-template-columns:1.45fr 1fr;gap:16px;min-height:0}
+.hero{position:relative;border-radius:40px;padding:24px 26px 20px;overflow:hidden;background:var(--glass);border:1px solid color-mix(in oklab,var(--a1) 35%,var(--glass-line));display:flex;flex-direction:column;transition:border-color .4s}
+.hero::before{content:"";position:absolute;inset:-30% -10% 40% 30%;background:radial-gradient(closest-side,color-mix(in oklab,var(--a1) 40%,transparent),transparent);pointer-events:none}
+.hero>*{position:relative}
+.hero-top{display:flex;align-items:center;gap:14px}
+.state-l{font:800 12px Manrope;letter-spacing:.18em;text-transform:uppercase;color:color-mix(in oklab,var(--a1) 65%,var(--text))}
+.headline{font:800 46px/1 Manrope;letter-spacing:-.055em;margin:16px 0 8px}
+.sub{color:var(--muted);font-size:15px;max-width:540px}
+.hero .arc{margin:auto 0 4px}
+.retry{align-self:flex-start;margin-top:8px}
+.side{display:grid;grid-template-columns:1fr 1fr;gap:12px;align-content:start}
+.tile{position:relative;overflow:hidden;border-radius:28px;padding:16px 18px;background:var(--glass);border:1px solid var(--glass-line);min-height:124px;transition:transform .3s var(--spring),border-radius .3s var(--spring)}
+.tile:hover{transform:translateY(-3px);border-radius:36px}
+.tile:nth-child(1){border-radius:30px 30px 30px 12px}.tile:nth-child(4){border-radius:30px 12px 30px 30px}
+.tile .k{font:700 12px Manrope;color:var(--muted)}
+.tile .v{font:800 19px/1.2 Manrope;letter-spacing:-.03em;margin-top:6px}
+.tile .num{font:800 34px/1 "JetBrains Mono";letter-spacing:-.05em;margin-top:6px}
+.tile .num small{font:600 14px Manrope;color:var(--muted);margin-left:4px}
+.tile .appic{width:30px;height:30px;border-radius:10px;display:inline-grid;place-items:center;color:#fff;margin-bottom:4px}
+.tile.wide{grid-column:span 2;display:flex;align-items:center;justify-content:space-between;min-height:0;padding:18px 20px}
+.switch{width:64px;height:38px;border-radius:999px;background:var(--accent);position:relative;border:0;cursor:pointer;flex:none;transition:background .3s}
+.switch::after{content:"";position:absolute;top:5px;left:31px;width:28px;height:28px;border-radius:50%;background:#fff;transition:left .35s var(--spring),width .3s,top .3s}
+.switch:active::after{width:32px}
+.switch[aria-pressed=false]{background:var(--glass-2);box-shadow:inset 0 0 0 2px var(--faint)}
+.switch[aria-pressed=false]::after{left:9px;top:11px;width:16px;height:16px;background:var(--faint)}
+
+/* android list-detail */
+.ld{display:grid;grid-template-columns:390px 1fr;height:100%}
+.ld-list{padding:24px 20px 110px;overflow:auto;position:relative}
+.ld-list h3,.pd-name{font:800 42px/.95 Manrope;letter-spacing:-.06em;margin:4px 4px 14px}
+.pc{display:flex;gap:14px;align-items:center;padding:14px;border-radius:28px;background:var(--glass);border:1px solid var(--glass-line);margin-top:10px;cursor:pointer;width:100%;text-align:left;transition:transform .3s var(--spring),border-radius .3s var(--spring),background .3s}
+.pc:hover{transform:scale(1.015)}
+.pc[aria-selected=true]{background:color-mix(in oklab,var(--a1) 22%,var(--glass));border-color:color-mix(in oklab,var(--a1) 50%,transparent);border-radius:18px}
+.pc .meta{flex:1;min-width:0}.pc .meta b{display:block;font-size:16px}.pc .meta span{font-size:13px;color:var(--muted)}
+.av{width:54px;height:54px;border-radius:18px;display:grid;place-items:center;background:linear-gradient(135deg,var(--a1),var(--a3));color:#fff;flex:none}
+.av.off{background:var(--glass-2);color:var(--muted)}
+.av.xl{width:96px;height:96px;border-radius:32px;transform-origin:top left}
+.badge{font-size:11px;font-weight:800;padding:5px 10px;border-radius:999px;background:color-mix(in oklab,var(--accent) 22%,transparent);color:var(--accent-2)}
+.section-t{font:800 12px Manrope;color:var(--muted);margin:24px 6px 2px;letter-spacing:.14em;text-transform:uppercase}
+.app{display:flex;align-items:center;gap:12px;padding:12px 14px;border-radius:22px;background:var(--glass);border:1px solid var(--glass-line);margin-top:8px}
+.app .ic{width:38px;height:38px;border-radius:12px;flex:none}
+.app .t{flex:1}.app .t b{font-size:15px}.app .t div{font-size:12px;color:var(--muted)}
+.fab{position:absolute;left:20px;bottom:20px;z-index:3;height:66px;padding:0 26px;border-radius:22px;border:0;background:var(--accent);color:#fff;font:800 16px Manrope;display:flex;align-items:center;gap:12px;cursor:pointer;
+  box-shadow:0 18px 40px -10px color-mix(in oklab,var(--accent) 80%,transparent)}
+.fab:active{border-radius:33px}
+.ld-detail{position:relative;margin:14px 14px 14px 0;border-radius:38px;overflow:hidden;background:var(--glass);border:1px solid var(--glass-line);padding:30px 32px}
+.pd-head{display:flex;gap:22px;align-items:center;margin-bottom:22px}
+.pd-name{font-size:56px;margin:0 0 10px}
+.pd-grid{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+.pcard{border-radius:26px;padding:18px;background:var(--glass-2);border:1px solid var(--glass-line)}
+.pcard .k,.wcard .k{font:700 12px Manrope;color:var(--muted)}
+.addr{list-style:none;margin:10px 0 0;padding:0}
+.addr li{display:flex;gap:12px;align-items:center;padding:8px 0;font-size:13px;position:relative}
+.addr li b{width:24px;height:24px;border-radius:8px;display:grid;place-items:center;background:var(--glass-2);font:800 12px "JetBrains Mono";flex:none}
+.addr li:first-child b{background:var(--a1);color:#fff;box-shadow:0 0 14px var(--a1)}
+.fp{margin-top:6px;font-size:14px}
+.pd-act{grid-column:span 2;display:flex;gap:10px}
+.m3btn{height:52px;padding:0 24px;border-radius:999px;border:0;font:800 15px Manrope;cursor:pointer;background:var(--accent);color:#fff}
+.m3btn:active{border-radius:16px}
+.m3btn.tonal{background:color-mix(in oklab,var(--accent) 22%,transparent);color:var(--text)}
+.m3btn.danger{background:transparent;box-shadow:inset 0 0 0 2px color-mix(in oklab,var(--err) 70%,transparent);color:var(--err)}
+.m3btn.text{background:transparent;color:var(--accent-2)}
+.m3btn:disabled{opacity:.4;cursor:default}
+
+/* overlay: QR scan -> pairing confirmation */
+.ov{position:absolute;inset:0;z-index:6;display:grid;place-items:center;background:rgba(3,6,12,.6);backdrop-filter:blur(8px);animation:fade .3s both}
+@keyframes fade{from{opacity:0}}
+.vf{width:330px;height:330px;border-radius:46px;position:relative;overflow:hidden;background:radial-gradient(120% 100% at 30% 20%,#2A3550,#0B0F18);box-shadow:0 30px 80px -20px #000}
+.vf .c{position:absolute;width:56px;height:56px;border:5px solid #fff;transition:all .3s var(--spring)}
+.vf .c1{top:34px;left:34px;border-right:0;border-bottom:0;border-radius:18px 0 0 0}
+.vf .c2{top:34px;right:34px;border-left:0;border-bottom:0;border-radius:0 18px 0 0}
+.vf .c3{bottom:34px;left:34px;border-right:0;border-top:0;border-radius:0 0 0 18px}
+.vf .c4{bottom:34px;right:34px;border-left:0;border-top:0;border-radius:0 0 18px 0}
+.vf.locked .c{border-color:var(--ok)}
+.vf.locked .c1{top:66px;left:66px}.vf.locked .c2{top:66px;right:66px}.vf.locked .c3{bottom:66px;left:66px}.vf.locked .c4{bottom:66px;right:66px}
+.vf-qr{position:absolute;inset:86px;background:#fff;border-radius:8px;padding:8px;opacity:.85;transform:rotate(-6deg) scale(.92);transition:transform .3s var(--spring)}
+.vf.locked .vf-qr{transform:none}
+.beam{position:absolute;left:24px;right:24px;height:3px;border-radius:3px;background:linear-gradient(90deg,transparent,var(--ok),transparent);box-shadow:0 0 22px 6px color-mix(in oklab,var(--ok) 50%,transparent);animation:beam 1.6s var(--ease) infinite alternate}
+.vf.locked .beam{opacity:0}
+@keyframes beam{from{top:16%}to{top:84%}}
+.ov-cap{position:absolute;bottom:52px;left:0;right:0;text-align:center;color:#fff;font:800 18px Manrope;letter-spacing:-.02em}
+.dlg{width:460px;border-radius:34px;background:var(--bg-2);border:1px solid var(--glass-line);padding:26px 28px 20px;box-shadow:0 40px 100px -20px rgba(0,0,0,.7);position:relative;overflow:hidden}
+.dlg>.aurora{opacity:.35}
+.dlg>*{position:relative;z-index:2}
+.dlg h4{font:800 28px/1.05 Manrope;letter-spacing:-.05em;margin:14px 0 8px}
+.dlg p{color:var(--muted);margin:14px 0 0}
+.dlg .k{font:700 12px Manrope;color:var(--muted);margin-top:14px}
+.dlg .cells{margin-top:8px}
+.dlg-act{display:flex;justify-content:flex-end;gap:8px;margin-top:22px}
+
+/* wizard (portrait) */
+.wscreen{padding:30px 24px 24px;overflow:auto;height:100%}
+.steps{display:flex;gap:6px;margin-bottom:20px}
+.steps span{flex:1;height:10px;border-radius:10px;background:var(--glass-2);overflow:hidden;position:relative}
+.steps span.done{background:var(--accent)}
+.steps span.cur svg{position:absolute;left:0;top:0;height:10px;width:100%}
+.steps span.cur path{fill:none;stroke:var(--accent);stroke-width:3;stroke-linecap:round}
+.wiz{animation:wenter .35s var(--spring) both}
+@keyframes wenter{from{opacity:0;transform:translateX(30px) scale(.98)}to{opacity:1;transform:none}}
+.illus{height:240px;border-radius:42px;position:relative;overflow:hidden;display:grid;place-items:center;margin-bottom:22px;background:var(--glass);border:1px solid var(--glass-line)}
+.illus>*{position:relative;z-index:2}
+.illus>.aurora{z-index:0}
+.wiz h3{font:800 32px/1 Manrope;letter-spacing:-.055em;margin:0}
+.wiz p{color:var(--muted);line-height:1.55;font-size:15px}
+.field{margin-top:12px}
+.field label{display:block;font-size:12px;color:var(--muted);font-weight:700;margin-bottom:6px}
+.code{display:flex;gap:8px}
+.code input{width:46px;height:58px;border-radius:16px;border:1px solid var(--glass-line);background:var(--glass);color:var(--text);text-align:center;font:800 24px "JetBrains Mono"}
+.code input:focus{outline:2px solid var(--accent);border-color:transparent}
+.primary{width:100%;height:58px;border-radius:999px;border:0;background:var(--accent);color:#fff;font:800 16px Manrope;margin-top:20px;cursor:pointer;box-shadow:0 14px 30px -12px var(--accent)}
+.primary:active{border-radius:18px;transform:scale(.98)}
+.ghost{width:100%;height:50px;border-radius:999px;border:1px solid var(--glass-line);background:transparent;font:700 15px Manrope;margin-top:10px;cursor:pointer}
+.check{display:flex;gap:12px;align-items:flex-start;padding:14px;border-radius:22px;background:var(--glass);border:1px solid var(--glass-line);margin-top:10px}
+.check .ok{width:30px;height:30px;border-radius:50%;background:color-mix(in oklab,var(--ok) 20%,transparent);display:grid;place-items:center;flex:none;color:var(--ok)}
+.check b{display:block;font-size:14px}.check span{font-size:13px;color:var(--muted)}
+.taps{display:flex;gap:7px;margin-top:14px;justify-content:center}
+.taps i{width:12px;height:12px;border-radius:50%;background:var(--a2);box-shadow:0 0 10px color-mix(in oklab,var(--a2) 60%,transparent)}
+.sunny{width:120px;height:120px;background:conic-gradient(var(--a1),var(--a2),var(--a3),var(--a1));display:grid;place-items:center}
+.x7{position:absolute;font:800 34px "JetBrains Mono";color:#fff;letter-spacing:-.06em}
+.wifi path{fill:none;stroke:var(--a2);stroke-width:1.8;stroke-linecap:round}
+.wifi path:nth-child(1){opacity:.35}.wifi path:nth-child(2){opacity:.65}
+.mini-vf{width:170px;height:170px;position:relative}
+.mini-vf .vf-qr{inset:22px;transform:none;opacity:1}
+.mini-vf .c{position:absolute;width:38px;height:38px;border:4px solid var(--ok)}
+.mini-vf .beam{left:6px;right:6px;top:52%;animation:none}
+.done-ill svg .ck{fill:none;stroke:var(--ok);stroke-width:2.2;stroke-linecap:round;stroke-linejoin:round;stroke-dasharray:30;stroke-dashoffset:30;animation:draw .35s .15s var(--ease) forwards}
+.done-ill svg .cc{fill:none;stroke:var(--ok);stroke-width:1.6;stroke-dasharray:60;stroke-dashoffset:60;animation:draw .4s var(--ease) forwards}
+@keyframes draw{to{stroke-dashoffset:0}}
+.orbit{position:absolute;inset:0}
+.orbit .kcap{position:absolute;min-width:34px;height:30px;font-size:11px}
+
+/* ---------- windows ---------- */
+.win{width:1080px;height:700px;border-radius:12px;position:relative;overflow:hidden;display:grid;grid-template-rows:40px 1fr;background:var(--mica);border:1px solid var(--glass-line);flex:none;
+  box-shadow:0 50px 120px -30px rgba(0,0,0,.6),0 0 160px -60px var(--a1);font-family:"Segoe UI Variable Text","Segoe UI",Manrope,sans-serif;isolation:isolate}
+.win>.aurora{opacity:calc(var(--aur-o)*.5)}
+.tbar{display:flex;align-items:center;gap:10px;padding-left:14px;font-size:12px;position:relative;z-index:2}
+.tbar .logo{width:18px}
+.caps{margin-left:auto;display:flex}
+.caps span{width:46px;height:40px;display:grid;place-items:center;color:var(--muted)}
+.caps span:hover{background:var(--glass-2)}.caps span:last-child:hover{background:#C42B1C;color:#fff}
+.wbody{display:grid;grid-template-columns:236px 1fr;min-height:0;position:relative;z-index:2}
+.wnav{padding:4px 6px;position:relative}
+.wnav button{width:100%;display:flex;align-items:center;gap:14px;height:40px;padding:0 12px;margin-bottom:3px;border-radius:6px;border:0;background:transparent;font:500 14px "Segoe UI Variable Text","Segoe UI",Manrope,sans-serif;cursor:pointer;text-align:left;transition:background .2s}
+.wnav button:hover{background:var(--glass-2)}
+.wnav button[aria-current=true]{background:var(--glass-2);font-weight:600}
+.ind{position:absolute;left:6px;top:0;width:3px;height:16px;border-radius:3px;background:var(--accent);transform-origin:center}
+.wmain{padding:16px 30px 26px;overflow:auto;min-width:0;border-top-left-radius:8px;background:color-mix(in oklab,var(--bg-2) 30%,transparent);border-left:1px solid var(--glass-line);border-top:1px solid var(--glass-line)}
+.wmain h2{font:700 40px/1 "Segoe UI Variable Display","Segoe UI",Manrope,sans-serif;letter-spacing:-.035em;margin:10px 0 6px}
+.lead{color:var(--muted);margin:0 0 16px}
+.ac{background:var(--acr);backdrop-filter:blur(26px) saturate(1.4);border:1px solid var(--glass-line);border-radius:8px}
+.whero{padding:16px 20px 14px;position:relative;overflow:hidden;border-color:color-mix(in oklab,var(--a1) 35%,var(--glass-line));transition:border-color .4s}
+.whero::before{content:"";position:absolute;inset:-60% 40% 30% -10%;background:radial-gradient(closest-side,color-mix(in oklab,var(--a1) 35%,transparent),transparent);pointer-events:none}
+.whero>*{position:relative}
+.whero .headline{font:700 30px/1.05 "Segoe UI Variable Display","Segoe UI",Manrope,sans-serif;letter-spacing:-.035em;margin:4px 0 0}
+.whero .sub{margin-top:6px}
+.whero .arc{margin:-6px 0 2px}
+.whero .chip{border-radius:6px;height:30px}
+.wgrid{display:grid;grid-template-columns:1.3fr 1fr;gap:12px;margin-top:12px}
+.wgrid.three{grid-template-columns:repeat(3,minmax(0,1fr))}
+.wcard{padding:16px 18px;transition:transform .35s var(--spring),border-color .3s}
+.wcard:hover{transform:translateY(-2px);border-color:color-mix(in oklab,var(--a1) 45%,transparent)}
+.wcard .v{font-size:18px;font-weight:600;margin-top:6px}
+.wcard .big{font:800 38px/1.1 "JetBrains Mono";letter-spacing:-.05em;margin-top:4px}
+.wcard .big small{font:500 14px "Segoe UI",Manrope,sans-serif;color:var(--muted);margin-left:4px;letter-spacing:0}
+.keyrow{display:flex;align-items:center;gap:10px;margin-top:10px;font-size:12.5px;color:var(--muted)}
+.wbtn{height:32px;padding:0 14px;border-radius:4px;border:1px solid var(--glass-line);background:var(--glass-2);font:500 14px "Segoe UI Variable Text","Segoe UI",Manrope,sans-serif;cursor:pointer;transition:transform .3s var(--spring),filter .2s}
+.wbtn:hover{filter:brightness(1.15)}.wbtn:active{transform:scale(.96)}
+.wbtn.accent{background:var(--accent);border-color:transparent;color:#fff}
+.wbtn.danger{background:#C42B1C;border-color:transparent;color:#fff}
+.btns{display:flex;gap:8px;margin-top:14px}
+.devrow{display:flex;align-items:center;gap:14px;padding:14px;margin-top:8px}
+.devrow .nd{width:46px;height:46px;border-radius:10px;display:grid;place-items:center;background:linear-gradient(135deg,var(--a1),var(--a3));color:#fff;flex:none}
+.devrow .nd.off{background:var(--glass-2);color:var(--muted)}
+.devrow .meta{flex:1;min-width:0}.devrow .meta b{display:flex;align-items:center;gap:10px;font-weight:600}
+.devrow .meta span{font-size:13px;color:var(--muted)}
+.bars{display:flex;gap:3px;align-items:flex-end;height:18px}
+.bars i{width:4px;border-radius:2px;background:var(--ok)}
+.bars i:nth-child(1){height:6px}.bars i:nth-child(2){height:11px}.bars i:nth-child(3){height:16px}
+.pair{display:grid;grid-template-columns:auto 1fr;gap:26px;align-items:start}
+.qrwrap{position:relative;padding:14px}
+.qrwrap::before{content:"";position:absolute;inset:0;border-radius:20px;background:conic-gradient(var(--a1),var(--a2),var(--a3),var(--a1));filter:blur(18px);opacity:.55}
+.qr{width:236px;height:236px;border-radius:14px;background:#fff;padding:14px;position:relative;overflow:hidden}
+.g21{display:grid;grid-template-columns:repeat(21,1fr);width:100%;height:100%}
+.g21 i{background:#0B111C;border-radius:1.5px}.g21 i.o{background:transparent}
+.qr .g21 i{animation:qrin .3s var(--spring) both;animation-delay:var(--d)}
+@keyframes qrin{from{opacity:0;transform:scale(.1)}}
+.sweep{position:absolute;inset:14px;background:linear-gradient(180deg,transparent 0%,color-mix(in oklab,var(--accent) 40%,transparent) 50%,transparent 100%);background-size:100% 40%;background-repeat:no-repeat;animation:sweep 2.6s var(--ease) infinite}
+@keyframes sweep{from{background-position:0 -40%}to{background-position:0 140%}}
+.cells.big span{width:42px;height:54px;font-size:26px;border-radius:8px}
+.cdrow{display:flex;align-items:center;gap:16px}
+.ring{width:64px;height:64px;transform:rotate(-90deg);flex:none}
+.ring circle{fill:none;stroke-width:6}.ring .r-bg{stroke:var(--glass-2)}
+.ring .r-fg{stroke:var(--a1);stroke-linecap:round;transition:stroke-dashoffset 1s linear;filter:drop-shadow(0 0 6px var(--a1))}
+.cdt{font:800 26px "JetBrains Mono";letter-spacing:-.04em}
+.topo{display:block;width:100%;height:auto;margin-top:10px}
+.topo .fl{fill:none;stroke:var(--a2);stroke-width:2.5;stroke-dasharray:2 9;stroke-linecap:round}
+.topo rect{fill:var(--node);stroke:var(--glass-line)}
+.topo text{font:600 12px "Segoe UI",Manrope,sans-serif;fill:var(--text);text-anchor:middle}
+.topo .s{font:500 10.5px "JetBrains Mono";fill:var(--muted)}
+.tb{height:32px;flex:1;border-radius:4px;border:1px solid var(--glass-line);border-bottom:2px solid var(--accent);background:var(--glass-2);padding:0 10px;color:var(--text);font:13px "JetBrains Mono"}
+.log{font:12.5px/1.95 "JetBrains Mono";padding:14px 16px}
+.log div{white-space:nowrap}
+.log time{color:var(--faint);margin-right:10px}
+.tag{display:inline-block;padding:0 7px;border-radius:4px;margin-right:6px;font-weight:700;font-size:11px}
+.t-ok{background:color-mix(in oklab,var(--ok) 22%,transparent);color:var(--ok)}
+.t-ac{background:color-mix(in oklab,var(--accent) 25%,transparent);color:var(--accent-2)}
+.t-wa{background:color-mix(in oklab,var(--warn) 22%,transparent);color:var(--warn)}
+.t-vi{background:rgba(160,120,255,.22);color:#B79CFF}
+.caret{display:inline-block;width:8px;height:15px;background:var(--a2);vertical-align:middle;opacity:.7}
+.wdlg{position:absolute;inset:0;z-index:5;display:grid;place-items:center;background:rgba(0,0,0,.35);animation:fade .2s both}
+.wdlg .box{width:420px;border-radius:8px;background:var(--acr-2);border:1px solid var(--glass-line);box-shadow:0 30px 80px -10px rgba(0,0,0,.6);overflow:hidden;animation:pop .35s var(--spring) both}
+@keyframes pop{from{transform:scale(1.06);opacity:0}}
+.wdlg .bd{padding:22px 24px}.wdlg h3{margin:0 0 10px;font:600 20px "Segoe UI Variable Display","Segoe UI",Manrope,sans-serif}
+.wdlg .ft{display:flex;gap:8px;padding:18px 24px;background:var(--glass-2);border-top:1px solid var(--glass-line)}
+.wdlg .ft .wbtn{flex:1}
+
+/* tray */
+.trayzone{display:flex;gap:30px;margin-top:26px;align-items:flex-end;flex-wrap:wrap}
+.legend{display:flex;gap:12px;flex-wrap:wrap}
+.lg{display:flex;gap:12px;align-items:center;padding:12px 16px 12px 12px;border-radius:14px;background:var(--glass);border:1px solid var(--glass-line);transition:transform .4s var(--spring),border-color .4s;font-size:13px}
+.lg[aria-current=true]{border-color:var(--a1);transform:translateY(-4px)}
+.lg b{display:block;font-size:13px}.lg span{color:var(--muted);font-size:12px}
+.ti{width:44px;height:44px;border-radius:10px;background:var(--acr);display:grid;place-items:center}
+.ti svg{width:26px;height:26px}
+.tray-stage{position:relative;padding-top:150px}
+.taskbar{height:50px;width:430px;border-radius:10px;background:var(--acr-2);border:1px solid var(--glass-line);display:flex;align-items:center;justify-content:flex-end;gap:2px;padding:0 10px;backdrop-filter:blur(20px);font:12px "Segoe UI",Manrope,sans-serif}
+.taskbar .tic{width:34px;height:38px;border-radius:6px;display:grid;place-items:center;color:var(--muted)}
+.taskbar .tic.kr{background:var(--glass-2);box-shadow:inset 0 0 0 1px var(--glass-line)}
+.taskbar .tic svg{width:17px;height:17px}
+.clock{text-align:right;line-height:1.25;padding:0 8px;color:var(--text)}
+.flyout{position:absolute;right:150px;bottom:62px;width:230px;border-radius:8px;padding:4px;background:var(--acr-2);border:1px solid var(--glass-line);box-shadow:0 24px 60px -12px rgba(0,0,0,.55);backdrop-filter:blur(26px);animation:fly .3s var(--spring) both}
+@keyframes fly{from{opacity:0;transform:translateY(14px) scale(.96)}}
+.flyout .hd{padding:10px 12px;font-size:12px;color:var(--muted);display:flex;gap:10px;align-items:center}
+.flyout button{display:flex;width:100%;height:36px;align-items:center;gap:12px;padding:0 12px;border-radius:4px;border:0;background:transparent;font:14px "Segoe UI",Manrope,sans-serif;cursor:pointer}
+.flyout button:hover{background:var(--glass-2)}
+.flyout hr{border:0;border-top:1px solid var(--glass-line);margin:4px 0}
+
+/* ---------- scenes (interaction-only choreography) ---------- */
+[data-s=verify]{--a1:#8B5CF6;--a2:#A78BFA;--a3:#6D28D9}
+[data-s=paused]{--a1:#7C86A8;--a2:#A78BFA;--a3:#4B5675}
+[data-s=paused] .a-flow{opacity:0}[data-s=paused] .a-halo{opacity:.25}[data-s=paused] .a-still{opacity:0}
+.nt,.nt *{transition:none!important}
+.fx{position:absolute;inset:0;pointer-events:none;z-index:30}
+.fly{position:absolute;display:grid;place-items:center;font-family:"JetBrains Mono",monospace;font-weight:800;color:var(--accent-2);background:var(--node);border:1.5px solid var(--glass-line);transition:background .25s,border-color .25s,box-shadow .25s,color .25s}
+.fly.busy{border-color:#8B5CF6;color:#C4B5FD;background:color-mix(in oklab,#8B5CF6 20%,var(--node));box-shadow:0 0 0 3px rgba(139,92,246,.25),0 0 22px rgba(139,92,246,.5)}
+.fly.ok{border-color:var(--ok);color:var(--ok);background:color-mix(in oklab,var(--ok) 16%,var(--node));box-shadow:0 0 0 3px color-mix(in oklab,var(--ok) 25%,transparent),0 0 22px color-mix(in oklab,var(--ok) 45%,transparent)}
+html[data-theme=light] .fly.busy{color:#6D28D9}html[data-theme=light] .fly.ok{color:#0E8F63}
+.wires{position:absolute;left:0;top:0;width:100%;height:100%;overflow:visible}
+.wires line{stroke:#8B5CF6;stroke-width:3;stroke-linecap:round;stroke-dasharray:1;stroke-dashoffset:1;transition:stroke .25s}
+.wires line.ok{stroke:var(--ok)}
+.ftarget{position:absolute;width:80px;height:80px;border-radius:26px;display:grid;place-items:center;color:#fff;background:linear-gradient(135deg,#19C98C,#0EA5A5);box-shadow:0 18px 40px -10px rgba(25,201,140,.6)}
+.ftarget .bdg{position:absolute;right:-8px;bottom:-8px;width:30px;height:30px;border-radius:50%;background:#fff;display:grid;place-items:center;box-shadow:0 4px 12px rgba(0,0,0,.25)}
+.ftarget .bdg path{fill:none;stroke:#0E8F63;stroke-width:3;stroke-linecap:round;stroke-linejoin:round;stroke-dasharray:1}
+.ring2{position:absolute;width:80px;height:80px;border:2px solid var(--ok);border-radius:30px}
+.pt{position:absolute;width:7px;height:7px;border-radius:50%;background:var(--ok)}.pt.w{background:#fff}
+.flyic{position:absolute;border-radius:12px;box-shadow:0 10px 24px -6px rgba(0,0,0,.4)}.flyic i{position:absolute;inset:0;border-radius:inherit}
+.acts{display:flex;gap:8px}
+.tsum{display:flex;align-items:center;gap:10px;margin:10px 6px 0;font-size:12px;color:var(--muted);font-weight:700}
+.tstack{display:flex;min-height:22px}.tstack i{width:22px;height:22px;border-radius:7px;border:2px solid var(--bg-2);margin-left:-6px}.tstack i:first-child{margin-left:0}
+.scenes{display:flex;gap:8px;flex-wrap:wrap;justify-content:center;align-items:center;margin-top:12px}
+.scenes b{font:800 11px Manrope;letter-spacing:.14em;text-transform:uppercase;color:var(--muted);margin-right:4px}
+.scn{height:34px;padding:0 14px 0 10px;border-radius:999px;border:1px solid var(--glass-line);background:var(--glass);font:700 13px Manrope;cursor:pointer;display:inline-flex;align-items:center;gap:6px;transition:transform .3s var(--spring)}
+.scn:active{transform:scale(.95)}.scn svg{width:13px;height:13px;color:var(--accent-2)}
+.empty{color:var(--muted);font-size:14px;padding:10px 6px}
+.pd-empty{height:100%;display:grid;place-items:center;color:var(--faint)}
+.devrow.new{border-color:color-mix(in oklab,var(--ok) 60%,transparent);box-shadow:0 0 0 3px color-mix(in oklab,var(--ok) 18%,transparent)}
+.nbadge{font:800 10px Manrope;padding:2px 7px;border-radius:999px;background:var(--ok);color:#05261B;margin-left:auto}
+.wtoast{display:flex;align-items:center;gap:12px;padding:12px 14px;margin-top:14px}
+.wtoast .ck{width:34px;height:34px;border-radius:50%;background:var(--ok);color:#05261B;display:grid;place-items:center;flex:none}
+#sc-tile{cursor:pointer}
+/* bin eats label */
+.binbtn{position:relative;display:inline-flex;align-items:center;justify-content:center;gap:8px}
+.binbtn .bin{width:18px;height:18px;display:inline-grid;place-items:center;flex:none}
+.binbtn .bin svg{overflow:visible}
+.binbtn .lid{transform-box:fill-box;transform-origin:0% 100%}
+.binbtn .lbl{display:inline-flex}
+.binbtn .lbl i{display:inline-block;font-style:normal}.binbtn .lbl b{display:inline-block;font-weight:inherit;white-space:pre}
+.binbtn.eaten .lbl{visibility:hidden}
+.binbtn.fail{background:var(--err)!important;color:#fff!important;box-shadow:none!important}
+.binring{position:absolute;border:2px solid var(--err);border-radius:50%;pointer-events:none;z-index:100}
+.rowmsg{color:var(--err)!important;font-weight:700}
+/* paper plane */
+.planebtn{position:relative;isolation:isolate;transition:background .2s}
+.planebtn .pl-sheet{position:absolute;inset:0;border-radius:inherit;background:var(--accent);z-index:-1;opacity:0}
+.planebtn.folding{background:transparent!important;box-shadow:none}
+.planebtn.folding .pl-sheet{opacity:1}
+.planebtn.fail,.planebtn.fail .pl-sheet{background:var(--err)}
+.pl-plane{position:absolute;left:50%;top:50%;width:38px;height:38px;margin:-19px 0 0 -19px;opacity:0;pointer-events:none}
+.pl-plane svg{width:100%;height:100%;overflow:visible;filter:drop-shadow(0 6px 10px rgba(0,0,0,.3))}
+.pl-plane.hover{animation:hover 1.1s ease-in-out infinite alternate}
+@keyframes hover{from{transform:translateY(2px) rotate(-4deg)}to{transform:translateY(-4px) rotate(3deg)}}
+.dlg-pc{width:60px;height:60px;border-radius:20px;display:grid;place-items:center;color:#fff;background:linear-gradient(135deg,var(--a1),var(--a3))}
+.sendst{margin-top:10px;font:700 13px Manrope;color:var(--muted);display:flex;align-items:center;gap:8px}
+.sendst.err{color:var(--err)}
+.trail{position:absolute;left:0;top:0;width:100%;height:100%;overflow:visible;pointer-events:none}
+.trail .tp{fill:none;stroke:var(--accent-2);stroke-width:2;stroke-dasharray:4 7;stroke-linecap:round;opacity:.8}
+.trail .tm{fill:none;stroke:#fff;stroke-width:8}
+.tx,.ty{position:absolute;left:0;top:0}
+/* the target summary is a container that comes to the item */
+.tsum{position:relative;z-index:5;display:inline-flex;padding:7px 12px;border-radius:16px;background:var(--glass);border:1px solid var(--glass-line);box-shadow:0 10px 24px -14px rgba(0,0,0,.5)}
+.tstack{transform-origin:50% 100%}
+.qbeam{position:absolute;left:8px;right:8px;top:3px;height:3px;border-radius:3px;background:var(--accent);box-shadow:0 0 16px 4px color-mix(in oklab,var(--accent) 45%,transparent);z-index:2}
+.qr .g21{transition:opacity .3s}.qr.expired .g21{opacity:.3}.qr.expired{box-shadow:0 0 0 2px var(--err)}
+#newcode svg{vertical-align:-2px}#tgcount{display:inline-block}
+/* honest-wait controls (demo only) */
+.sim{display:flex;gap:10px;align-items:center;flex-wrap:wrap;justify-content:center;margin-top:10px;font-size:12px;color:var(--muted);font-weight:700}
+.sim input{accent-color:var(--accent);width:120px}
+.sim .scn:disabled{opacity:.4;cursor:default}
+.sim.live .scn:not(:disabled){border-color:var(--accent);color:var(--text)}
+
+/* ---------- implementation notes ---------- */
+.notes{width:100%;border-collapse:separate;border-spacing:0;font-size:13px;background:var(--glass);border:1px solid var(--glass-line);border-radius:24px;overflow:hidden}
+.notes th{text-align:left;font:800 11px Manrope;letter-spacing:.14em;text-transform:uppercase;color:var(--muted);padding:14px 16px;background:var(--glass-2)}
+.notes td{padding:12px 16px;border-top:1px solid var(--glass-line);vertical-align:top;line-height:1.5}
+.notes td:first-child{font-weight:800;white-space:nowrap}
+.notes code{font:12px "JetBrains Mono";color:var(--accent-2)}
+.uv{font:700 10px "JetBrains Mono";padding:2px 6px;border-radius:4px;background:color-mix(in oklab,var(--warn) 22%,transparent);color:var(--warn);white-space:nowrap}
+.foot{color:var(--muted);font-size:13px;margin-top:14px}
+
+@media (max-width:1100px){.mast-grid{grid-template-columns:1fr}.c-logo,.c-col,.c-type,.c-mot{grid-column:span 12}}
+@media (prefers-reduced-motion:reduce){*,*::before,*::after{animation:none!important;transition:none!important}html{scroll-behavior:auto}}
+</style>
+</head>
+<body>
+<div class="bgfx st grain" data-s="relay"><div class="aurora"></div></div>
+
+<header class="mast st grain arc-host" id="mast" data-s="relay">
+  <div class="aurora"></div>
+  <nav class="topnav" aria-label="Bölümler">
+    <span data-logo style="width:36px"></span><span class="nm">KeyRelay</span>
+    <span class="sp"></span>
+    <a href="#marka">Marka</a><a href="#android">Android</a><a href="#windows">Windows</a><a href="#notlar">Uygulama notları</a>
+    <div class="seg" role="group" aria-label="Tema"><button data-theme-btn="dark" aria-pressed="true">Koyu</button><button data-theme-btn="light" aria-pressed="false">Açık</button></div>
+  </nav>
+  <div class="mast-grid">
+    <div>
+      <p class="eyebrow">Arayüz taslakları · v4 · “Işık hattı”</p>
+      <h1>Klavyen,<br><span class="shine">ışık hızında</span><br>karşıda.</h1>
+      <p class="lede">Görünüm: tablet ile PC arasında parlayan statik bir ışık hattı; zemin duruma göre renk alan bir mesh gradyan (yönlendiriliyor mavi-camgöbeği, hazır yeşil, bekliyor kehribar, hata kırmızı) ve grain dokusu. Sürekli dönen animasyon yok — uygulamalar 7/24 arka planda çalışır. Hareket yalnız olayda ve en çok 400 ms: durum değişince renk ve rozet şekli, sayfa girişinde kartlar sırayla, basınca geri bildirim; tuş olayında (saniyede en çok 4) ışıklı bir kapakçık yay boyunca uçar ve PC'de küçük bir ışık patlamasıyla iner. Başlık ve metin Manrope 800 (sıkı), kod ve sayılar JetBrains Mono. "Animasyonları azalt" açıkken hiçbir şey hareket etmez. Taslaklar tıklanabilir: durum düğmeleri, sihirbaz adımları, PC listesi, QR → eşleştirme onayı ve Windows menüsü çalışır.</p>
+      <p class="lede" style="margin-top:14px"><b style="color:var(--text)">Sahneler — veri değiştirilmez, dönüşür.</b> Eşleştirmede 8 karakterlik kod kalkar, bir devreye dizilir (mor = doğrulanıyor), renk yeşile dalgalanır, tek bir PC kartına katlanır ve listeye yerleşir. Her sahne yalnız kullanıcı eylemiyle başlar, 3 saniyede biter, sonra her şey durur. Cihazların altındaki "Sahneler" düğmeleri tekrar oynatır.</p>
+      <div class="keybtn"><button class="m3btn press" id="sendkey">Tuş gönder</button><span>ya da klavyende bir tuşa bas — görünen tüm ışık hatlarında tek uçuş</span></div>
+      <div class="stats">
+        <div><b id="m-count">0</b><span>tuş ışınlandı</span></div>
+        <div><b data-to="3.8" data-dec="1">0</b><span>ms gecikme</span></div>
+        <div><b>TYIM-LHQO</b><span>PC kimliği</span></div>
+      </div>
+    </div>
+    <div class="mast-logo"><div class="logo-xl" data-logo></div></div>
+  </div>
+  <div class="mast-arc" data-arc="1200,250,tab,pc"></div>
+</header>
+
+<!-- ======================= BRAND ======================= -->
+<section id="marka">
+  <div class="shead"><span class="no">01</span><div><h2>Marka ve ikon</h2><p>İşaret: izometrik bir klavye tuşu, üstünde karşıya giden ok. Altındaki ışık halkası ve izometrik derinlik statiktir; tuş yalnız dokununca çöker. Ok tuşun başka bir makineye aktarılmasıdır.</p></div></div>
+  <div class="brand stag">
+    <div class="card c-logo">
+      <h3>Uygulama ikonu</h3>
+      <div class="bigmark" data-logo></div>
+      <div class="icons">
+        <div class="icon adaptive" aria-label="Uyarlanabilir ikon"><span data-logo></span><small>uyarlanabilir</small></div>
+        <div class="icon round" aria-label="Yuvarlak maske"><span data-logo></span><small>yuvarlak maske</small></div>
+        <div class="icon themed" aria-label="Tematik ikon"><span data-logo="mono"></span><small>tematik (tek renk)</small></div>
+      </div>
+      <p style="color:var(--muted);font-size:13px;margin:38px 0 0;line-height:1.5">Tüm ikonlar statiktir. Uygulama içinde işaret yalnız dokunulunca basılır (≤ 250 ms).</p>
+    </div>
+    <div class="card c-col">
+      <h3>Renkler</h3>
+      <div class="swatches">
+        <div class="sw" style="background:#0B111C;color:#E8EEF8;border:1px solid var(--glass-line)">Mürekkep<span>#0B111C</span></div>
+        <div class="sw" style="background:#4C7DFF;color:#fff">Vurgu<span>#4C7DFF</span></div>
+        <div class="sw" style="background:#2FD49C;color:#05261B">Hazır<span>#2FD49C</span></div>
+        <div class="sw" style="background:#F2B544;color:#2B1E00">Bekliyor<span>#F2B544</span></div>
+        <div class="sw" style="background:#111A29;color:#E8EEF8;border:1px solid var(--glass-line)">Yüzey<span>#111A29</span></div>
+        <div class="sw" style="background:#89A8FF;color:#0B1433">Vurgu açık<span>#89A8FF</span></div>
+        <div class="sw" style="background:#FF6B6B;color:#2B0606">Hata<span>#FF6B6B</span></div>
+        <div class="sw" style="background:#9AA8C0;color:#0B111C">İkincil metin<span>#9AA8C0</span></div>
+      </div>
+      <div class="orbs">
+        <div class="orb st" data-s="relay"><div class="aurora"></div><b>Yönlendiriliyor</b></div>
+        <div class="orb st" data-s="ready"><div class="aurora"></div><b>Hazır</b></div>
+        <div class="orb st" data-s="connecting"><div class="aurora"></div><b>Bekliyor</b></div>
+        <div class="orb st" data-s="error"><div class="aurora"></div><b>Hata</b></div>
+      </div>
+      <p style="color:var(--muted);font-size:13px;margin:14px 0 0;line-height:1.5">Aurora üçlüleri durum rengidir: yönlendiriliyor mavi + camgöbeği #22D3EE + mor, hazır yeşil, bekliyor kehribar, hata kırmızı. Android 12+'ta dinamik renk açıksa vurgu duvar kağıdından gelir; marka renkleri yedek şemadır, durum renkleri sabit kalır. Açık tema aynı tonların açık karşılıklarıyla.</p>
+    </div>
+    <div class="card c-type type">
+      <h3>Tipografi</h3>
+      <div class="big">Klavyen,<br>her yerde.</div>
+      <div class="mid">Manrope 800 — başlıklar, −%5,5 harf aralığı</div>
+      <div class="body">Durum, ayarlar ve açıklamalar için sade, okunaklı bir grotesk (500–700). Sayılar ve kodlar JetBrains Mono, tablo rakamlarıyla; büyük sayılar sayarak gelir.</div>
+      <div class="nums mono"><b data-to="482931">0</b><b style="color:var(--accent-2)">TYIM-LHQO</b></div>
+    </div>
+    <div class="card c-mot st" data-s="relay" id="motcard">
+      <h3>Hareket dili</h3>
+      <div class="morph-row"><div class="morph" data-morph id="motmorph"></div><div><b id="motname" style="font:800 22px Manrope;letter-spacing:-.04em">Yönlendiriliyor</b><div style="color:var(--muted);font-size:13px">Rozet şekli = durum: kurabiye → daire → yuvarlatılmış kare → elmas. Rozete dokun.</div></div></div>
+      <ul class="mot-list">
+        <li><b>Sürekli animasyon yok</b> · döngü, nabız, akış yok; ekran dururken CPU/GPU boşta.</li>
+        <li><b>Yalnız olayda, ≤ 400 ms</b> · durum değişimi, sayfa girişi, basma, tek seferlik sayaç ve kod çözme.</li>
+        <li><b>Işık hattı</b> · statik yay; gerçek tuş olayında kapakçık uçar (saniyede en çok 4).</li>
+        <li><b>Şekil</b> · durum değişince rozet biçim, zemin renk değiştirir.</li>
+        <li><b>Sahne</b> · kod → devre → onay: kalk, bağlan (mor), yeşile dön, tek karta katlan, bir kez patla.</li>
+        <li><b>Fiil = metafor</b> · kaldır = çöp kutusu etiketi yer; gönder = düğme uçağa katlanır; ekle = kap sana gelir.</li>
+        <li><b>Sessiz mod</b> · "animasyonları azalt" açıkken hiçbir şey hareket etmez.</li>
+      </ul>
+    </div>
+  </div>
+</section>
+
+<!-- ======================= ANDROID ======================= -->
+<section id="android">
+  <div class="shead"><span class="no">02</span><div><h2>Android · Material 3 Expressive</h2><p>Tablet yatay düzen. Büyük köşeler, dolu FAB, basınca köşesi değişen düğmeler; liste-ayrıntı iki bölmeli.</p></div></div>
+  <div class="row">
+
+    <!-- STATUS -->
+    <div class="devwrap">
+      <div class="tablet st" id="a-dev" data-s="relay"><div class="screen grain"><div class="aurora"></div><i class="cam"></i>
+        <div class="layer ascreen">
+          <div class="appbar">
+            <span data-logo></span><span class="ttl">KeyRelay</span><span class="sp"></span>
+            <button class="ibtn press" aria-label="PC'ler" data-ic="pc"></button>
+            <button class="ibtn press" aria-label="Ayarlar" data-ic="sliders"></button>
+          </div>
+          <div class="stgrid">
+            <div class="hero st arc-host" id="a-hero" data-s="relay">
+              <div class="hero-top">
+                <div class="morph" data-morph></div>
+                <div style="flex:1"><div class="state-l" data-f="st">Yönlendiriliyor</div></div>
+                <span class="chip">Son tuş <span class="kcap" id="a-key" style="min-width:34px;height:26px;font-size:11px">Tab</span></span>
+              </div>
+              <div class="headline" data-f="h">Tuşların homepc'de</div>
+              <div class="sub" data-f="s">TeamViewer önde · Alt+Tab, Win ve Ctrl+Alt+Del PC'ye gidiyor</div>
+              <div data-arc="600,190,tab,pc"></div>
+              <div class="chips">
+                <span class="chip"><span class="dot" data-dot="0"></span>MX Keys Mini</span>
+                <span class="chip"><span class="dot" data-dot="1"></span><span data-f="c2">Kilitli · güvenli</span></span>
+              </div>
+              <button class="m3btn press retry" data-show="error">Yeniden dene</button>
+            </div>
+            <div class="side stag">
+              <div class="tile"><div class="khead"><span class="kic" data-ic="gauge"></span><div class="k">Gecikme</div></div><div class="num"><span data-to="3.8" data-dec="1">0</span><small>ms</small></div><div data-wave="3,mini"></div></div>
+              <div class="tile"><span class="appic" style="background:#0E6EF6" data-ic="arrows"></span><div class="k">Hedef uygulama</div><div class="v">TeamViewer</div><div class="k" style="margin-top:4px">önde · otomatik</div></div>
+              <div class="tile"><span class="kic" data-ic="tunnel"></span><div class="k">Bağlantı</div><div class="v">Tailscale Funnel</div><div class="k" style="margin-top:4px;display:flex;gap:6px;align-items:center"><span data-ic="lock"></span>TLS · sabitlenmiş sertifika</div></div>
+              <div class="tile" id="sc-tile" title="Kısayolu dene"><div class="khead"><span class="kic" data-ic="kbd"></span><div class="k">Geçiş kısayolu</div></div><div class="kcaps" id="sc-caps" aria-label="Ctrl Alt `"><span class="kcap">Ctrl</span><span class="kcap">Alt</span><span class="kcap">`</span></div><div class="k" style="margin-top:8px">seçenek: ` · Ins · Space</div></div>
+              <div class="tile wide"><div><b style="font-size:17px">Yönlendirme</b><div style="font-size:13px;color:var(--muted);margin-top:2px">Kapalıyken klavye tablette kalır</div></div><button class="switch" id="a-sw" aria-pressed="true" aria-label="Yönlendirmeyi aç/kapat"></button></div>
+            </div>
+          </div>
+        </div>
+      </div></div>
+      <div class="ctl"><div class="seg" data-seg="android" role="group" aria-label="Android durum demosu">
+        <button data-k="relay" aria-pressed="true"><i style="background:#3B6CFF"></i>Yönlendiriliyor</button><button data-k="ready" aria-pressed="false"><i style="background:#19C98C"></i>Hazır</button><button data-k="connecting" aria-pressed="false"><i style="background:#F2B544"></i>Bekliyor</button><button data-k="error" aria-pressed="false"><i style="background:#FF5468"></i>Hata</button>
+      </div></div>
+      <div class="scenes"><b>Sahneler</b><button class="scn" data-scene="a-short"><span data-ic="play"></span>Kısayol (Ctrl Alt `)</button><button class="scn" data-scene="a-conn"><span data-ic="play"></span>Bağlanma / kopma</button></div>
+      <p class="label">Durum · ışık hattı, tuş olayında uçan kapakçık, şekil değiştiren rozet, duruma göre renk alan zemin · kısayol karosuna dokun</p>
+    </div>
+
+    <!-- PCS list-detail -->
+    <div class="devwrap">
+      <div class="tablet st" data-s="relay"><div class="screen grain"><div class="aurora"></div><i class="cam"></i>
+        <div class="layer ld" id="pcs">
+          <div class="ld-list">
+            <h3>PC'ler</h3>
+            <div class="stag" id="pclist"></div>
+            <div class="section-t">Hedef uygulamalar</div>
+            <div class="tsum">Hedefler <span class="tstack" id="tgstack"></span><span id="tgcount"></span></div>
+            <div class="app" data-app="TeamViewer"><div class="ic" style="background:#0E6EF6"></div><div class="t"><b>TeamViewer</b><div>Önde olduğunda yönlendir</div></div><button class="switch" aria-pressed="true" aria-label="TeamViewer"></button></div>
+            <div class="app" data-app="AnyDesk"><div class="ic" style="background:#EF443B"></div><div class="t"><b>AnyDesk</b><div>Önde olduğunda yönlendir</div></div><button class="switch" aria-pressed="false" aria-label="AnyDesk"></button></div>
+            <div class="app" data-app="Windows App"><div class="ic" style="background:#0078D4"></div><div class="t"><b>Windows App</b><div>Önde olduğunda yönlendir</div></div><button class="switch" aria-pressed="false" aria-label="Windows App"></button></div>
+          </div>
+          <button class="fab press" id="fab"><span data-ic="scan"></span>QR ile PC ekle</button>
+          <div class="ld-detail" id="pd"></div>
+          <div class="ov" id="ov" hidden></div>
+        </div>
+      </div></div>
+      <div class="scenes"><b>Sahneler</b><button class="scn" data-scene="a-pair"><span data-ic="play"></span>Eşleştirme · başarılı</button><button class="scn" data-scene="a-pair-fail"><span data-ic="play"></span>Eşleştirme · başarısız</button><button class="scn" data-scene="a-remove"><span data-ic="play"></span>PC kaldırma (çöp kutusu)</button><button class="scn" data-scene="a-target"><span data-ic="play"></span>Hedef uygulama ekleme (kap gelir)</button></div>
+      <div class="sim"><span>Simüle ağ süresi (taslak)</span><input type="range" id="simms" min="400" max="5000" step="100" value="1600" aria-label="Simüle ağ süresi"><output id="simout">1,6 sn</output><span>· bekleyen iş:</span><button class="scn" data-finish="ok" disabled>Başarılı bitir</button><button class="scn" data-finish="fail" disabled>Başarısız bitir</button></div>
+      <p class="label">PC'ler + hedef uygulamalar + PC ayrıntı (liste-ayrıntı) · kart → ayrıntı paylaşılan öğe geçişi · FAB → QR tarama → eşleştirme onayı → kod devreye, devre tek karta katlanır</p>
+    </div>
+
+    <!-- WIZARD -->
+    <div class="devwrap">
+      <div class="tablet portrait st" data-s="relay"><div class="screen grain"><div class="aurora"></div><i class="cam"></i>
+        <div class="layer wscreen">
+          <div class="steps" id="steps"><span></span><span></span><span></span><span></span></div>
+          <div id="wiz"></div>
+        </div>
+      </div></div>
+      <p class="label">Kurulum sihirbazı · 4 adım, bilgisayar gerekmez · dikey / bölünmüş ekran</p>
+    </div>
+  </div>
+</section>
+
+<!-- ======================= WINDOWS ======================= -->
+<section id="windows">
+  <div class="shead"><span class="no">03</span><div><h2>Windows · WinUI 3 + Mica</h2><p>Fluent disiplini: 4–8 px köşe, Segoe UI Variable, NavigationView. Üstüne Mica'ya lacivert aurora tonu, akrilik kartlar ve aynı ışık hattı.</p></div></div>
+  <div class="devwrap">
+    <div class="win st grain" id="win" data-s="relay">
+      <div class="aurora"></div>
+      <div class="tbar"><span data-logo></span>KeyRelay<div class="caps" aria-hidden="true"><span>&#8212;</span><span>&#9744;</span><span>&#10005;</span></div></div>
+      <div class="wbody">
+        <nav class="wnav" aria-label="KeyRelay menüsü">
+          <i class="ind" id="ind"></i>
+          <button data-p="status" aria-current="true"><span data-ic="pulse"></span>Durum</button>
+          <button data-p="devices"><span data-ic="tab"></span>Cihazlar</button>
+          <button data-p="pair"><span data-ic="qr"></span>Eşleştir</button>
+          <button data-p="network"><span data-ic="globe"></span>Ağ</button>
+          <button data-p="logs"><span data-ic="list"></span>Kayıtlar</button>
+        </nav>
+        <main class="wmain" id="wmain"></main>
+      </div>
+    </div>
+  </div>
+  <div class="ctl" style="justify-content:flex-start">
+    <div class="seg" data-seg="windows" role="group" aria-label="Windows durum demosu">
+      <button data-k="relay" aria-pressed="true"><i style="background:#3B6CFF"></i>Yönlendiriliyor</button><button data-k="ready" aria-pressed="false"><i style="background:#19C98C"></i>Hazır</button><button data-k="connecting" aria-pressed="false"><i style="background:#F2B544"></i>Bekliyor</button><button data-k="error" aria-pressed="false"><i style="background:#FF5468"></i>Hata</button>
+    </div>
+    <div class="seg" role="group" aria-label="Pencere teması"><button data-theme-btn="dark" aria-pressed="true">Koyu tema</button><button data-theme-btn="light" aria-pressed="false">Açık tema</button></div>
+  </div>
+  <div class="scenes" style="justify-content:flex-start"><b>Sahneler</b><button class="scn" data-scene="w-pair"><span data-ic="play"></span>Eşleşme · başarılı (QR okundu → kod → cihaz kartı)</button><button class="scn" data-scene="w-pair-fail"><span data-ic="play"></span>Eşleşme · kod süresi dolmuş</button><button class="scn" data-scene="w-revoke"><span data-ic="play"></span>Cihaz iptali (çöp kutusu)</button><button class="scn" data-scene="w-revoke-fail"><span data-ic="play"></span>Cihaz iptali · servis yok</button><button class="scn" data-scene="w-conn"><span data-ic="play"></span>Bağlanma / kopma</button></div>
+  <div class="trayzone">
+    <div class="legend" id="legend">
+      <div class="lg" data-t="ok" aria-current="true"><span class="ti" data-tray="ok"></span><div><b>Bağlı / yönlendiriliyor</b><span>KeyRelay · tablet bağlı</span></div></div>
+      <div class="lg" data-t="wait"><span class="ti" data-tray="wait"></span><div><b>Bekliyor (cihaz yok)</b><span>KeyRelay · tablet bekleniyor</span></div></div>
+      <div class="lg" data-t="err"><span class="ti" data-tray="err"></span><div><b>Kapalı / hata</b><span>KeyRelay · servise ulaşılamıyor</span></div></div>
+    </div>
+    <div class="tray-stage">
+      <div class="flyout" role="menu" aria-label="Tepsi menüsü">
+        <div class="hd"><span id="fly-ic" style="width:18px;display:grid"></span><span id="fly-tt">KeyRelay · tablet bağlı</span></div><hr>
+        <button role="menuitem"><span data-ic="open"></span>KeyRelay'i aç</button>
+        <button role="menuitem"><span data-ic="power"></span>Çıkış</button>
+      </div>
+      <div class="taskbar" aria-label="Görev çubuğu bildirim alanı">
+        <span class="tic" data-ic="chev"></span><span class="tic kr" id="tray-now"></span><span class="tic" data-ic="wifi"></span><span class="tic" data-ic="vol"></span>
+        <span class="clock">09:41<br>8.10.2026</span>
+      </div>
+    </div>
+  </div>
+  <p class="label" style="text-align:left">Tepsi simgesi 3 durum (durum düğmeleriyle değişir) · sol tık pencereyi açar, sağ tık menü · tepside animasyon yok</p>
+</section>
+
+<!-- ======================= NOTES ======================= -->
+<section id="notlar">
+  <div class="shead"><span class="no">04</span><div><h2>Uygulama notları</h2><p>Her efekt ek kütüphane olmadan yapılabilir. Android: Compose BOM 2026.09.00, material3 1.5.0-beta01 (graphics-shapes 1.0.1 geçişli gelir), minSdk 30. Windows: WindowsAppSDK 2.5.1, Win2D ve Lottie yok. Sürekli çalışan animasyon yok: her satır ya statik, ya bir olayla tetiklenen ≤ 400 ms geçiş, ya kullanıcı eylemiyle başlayıp 3 sn içinde biten bir sahne, ya yalnız Eşleştir sayfası açıkken, ya da dürüst bekleme olarak yalnız gerçek iş (TLS el sıkışması) sürerken çalışır. "Animasyonları azalt" açıkken sahneler doğrudan son kareye atlar.</p></div></div>
+  <div class="devwrap">
+  <table class="notes">
+    <thead><tr><th>Efekt</th><th>Tetikleyici</th><th>Compose yolu</th><th>WinUI yolu</th><th>Maliyet</th></tr></thead>
+    <tbody>
+      <tr><td>Çöp kutusu etiketi yer</td><td>Olay · kaldırma/iptal onayı · ~1,2 sn, sonra kart katlanır (+0,6 sn); hata yolu ~0,9 sn + sebep metni 2,2 sn</td><td>Kapak <code>graphicsLayer{rotationZ; transformOrigin=TransformOrigin(0f,1f)}</code> spring. Harfler ayrı <code>Text</code> + <code>graphicsLayer</code>; X <code>Animatable</code> <code>tween(LinearEasing)</code>, Y ayrı <code>Animatable</code> keyframes (yukarı ease-out, aşağı ease-in), dönme; gecikme sıra × 55 ms. Daireye büzülme: kabı <code>graphicsLayer</code> clip + animasyonlu inset'li <code>GenericShape</code>. Halka <code>Canvas</code> tek seferlik. Hata: harfler zıplayıp yerine döner, düğme kırmızı + sarsılma</td><td>Harfler ayrı <code>TextBlock</code>; <code>ElementCompositionPreview.SetIsTranslationEnabled</code> + "Translation.X" doğrusal, "Translation.Y" ayrı easing'li <code>ScalarKeyFrameAnimation</code>; kapak <code>RotationAngleInDegrees</code> + <code>CenterPoint</code>; büzülme <code>CreateInsetClip</code> Left/Right keyframe; halka ShapeVisual</td><td>Yalnız onayda; harf sayısı sabit (≤ 12)</td></tr>
+      <tr><td>Uçağa katlanma + dürüst bekleme (Android)</td><td>Olay · "Eşleştir" · katlanma 0,6 sn + <b>gerçek TLS el sıkışması süresi</b> + uçuş 0,6 sn → katlanıp bire dönüşme</td><td>Düğme yüzeyi <code>GenericShape</code>, köşe noktaları animasyonlu kesirle (dikdörtgen → yamuk → üçgen, nokta sayısı sabit); uçak vektörü <code>AnimatedVisibility</code>; süzülme <code>rememberInfiniteTransition</code> <b>yalnız</b> bağlantı durumu <code>Pending</code> iken composition'da (iş bitince ağaçtan çıkar → durur); uçuş X doğrusal / Y ease-out ayrı <code>Animatable</code>; kesikli iz <code>PathMeasure.getSegment</code> + <code>dashPathEffect</code>. Hata: uçak ease-in düşer, yüzey dikdörtgene açılır, kırmızı "Eşleşmedi" + <code>pair_unreachable</code> metni, 2,2 sn sonra dinlenme</td><td>—</td><td>Bekleme yalnız iş sürerken; taslakta süre kaydırıcı + "Başarılı/Başarısız bitir" ile temsil</td></tr>
+      <tr><td>QR okundu → kod (Windows)</td><td>Olay · tablet bağlandı · tarama 0,56 sn → çökme 0,38 sn → katlanıp bire dönüşme (~2,8 sn) → menüye uçuş; hata: <code>PairExpired</code> 1,8 sn + yenileme 0,5 sn + yeni QR stagger</td><td>—</td><td>Tarama ışını <code>Rectangle</code> "Translation.Y" tek <code>ScalarKeyFrameAnimation</code> (döngü yok); QR <code>Visual.Scale</code>/<code>RotationAngleInDegrees</code>/Opacity ile merkeze çöker, kapakçıklar aynı merkezden <code>SpringVector3NaturalMotionAnimation</code> ile çıkar. Hata: QR Opacity 0,3 + 2 px kırmızı kenar, <code>ProgressRing.Value</code> → 0, yenile ikonu tek <code>RotationAngleInDegrees</code> 0→360, yeni QR bitmap'i Opacity/Scale ile gelir (modül başına öğe yok)</td><td>Yalnız eşleşme anında</td></tr>
+      <tr><td>Sahne 1 · Eşleştirme (Android)</td><td>Olay · "Eşleştir" basışı · ~2,8 sn, sonra statik</td><td>8 kapakçık: her biri <code>Animatable&lt;Offset&gt;</code> + <code>spring(dampingRatio≈0,7)</code>, 35 ms gecikmeli; uçuşta <code>graphicsLayer.rotationZ</code>/scale. Bağlantı çizgileri <code>Canvas</code> + <code>PathMeasure.getSegment</code> ile ilerleme 0→1 (45 ms stagger). Mor→yeşil dalga <code>animateColorAsState</code> + indeks gecikmesi. Katlanma <code>updateTransition</code> (offset→merkez, rotation, scale→0,2). Patlama <code>Canvas</code> 16 nokta + halka, tek seferlik; ✓ <code>getSegment</code> ile çizim. Sonra kart listeye <code>SharedTransitionLayout</code>/<code>sharedBounds</code> ile yerleşir</td><td>—</td><td>Yalnız eşleştirmede; parçacık sabit 16</td></tr>
+      <tr><td>Sahne 1 · Eşleşme (Windows)</td><td>Olay · tablet eşleşti bildirimi · ~3,3 sn</td><td>—</td><td>Kapakçıklar Visual Offset <code>SpringVector3NaturalMotionAnimation</code> (<code>CreateSpringVector3Animation</code>, DampingRatio), <code>RotationAngleInDegrees</code> keyframe; çizgiler <code>CompositionLineGeometry</code> + <code>TrimEnd</code> 0→1 (compositor) ya da XAML <code>Line</code> + Storyboard <code>StrokeDashOffset</code>; renk <code>CreateColorKeyFrameAnimation</code>; QR <code>Visual.Scale</code>/Opacity; Cihazlar menüsüne uçuş <code>CreateVector3KeyFrameAnimation</code>; bitiş <code>CreateScopedBatch</code>.Completed</td><td>Yalnız eşleşmede</td></tr>
+      <tr><td>Sahne 2 · Bağlanma / kopma</td><td>Olay · durum değişimi · çizim 620 ms, kopma 420 ms</td><td>Yay yolu <code>PathMeasure.getSegment(0, L·p)</code>, p <code>Animatable</code>; kopmada iki yarım uçlara geri çekilir (iki segment); varışta tek patlama</td><td>XAML <code>Path</code> + Storyboard <code>StrokeDashArray</code>/<code>StrokeDashOffset</code> (<code>EnableDependentAnimation</code>) ya da <code>CompositionPathGeometry</code>+<code>TrimEnd</code> (<code>CompositionPath</code> Win2D'siz <span class="uv">doğrulanmadı</span>)</td><td>Durum değişimi başına bir kez</td></tr>
+      <tr><td>Sahne 3 · Kısayol (Ctrl Alt `)</td><td>Olay · kısayol algılandı · ~0,8 sn</td><td>Kapakçıklar sırayla <code>graphicsLayer.translationY</code> spring (130 ms aralık); ardından rozet <code>Morph</code> (Pill ⇄ Cookie9Sided), zemin rengi <code>animateColorAsState</code></td><td>Kısayol Windows'ta yok</td><td>Olay bazlı</td></tr>
+      <tr><td>Sahne 4 · PC kaldırma / cihaz iptali</td><td>Olay · çöp kutusu sahnesinden sonra · ~0,6 sn</td><td>Kart <code>graphicsLayer.rotationX</code> + scale + alpha 300 ms; liste aralığı <code>Modifier.animateItem</code> (spring) kapanır</td><td><code>Visual.RotationAxis</code>/<code>RotationAngleInDegrees</code> + Opacity; liste <code>RepositionThemeTransition</code></td><td>Olay bazlı</td></tr>
+      <tr><td>Sahne 5 · Sana gelen kap (hedef uygulama)</td><td>Olay · anahtar açıldı · ~1,5 sn</td><td>İkon kopyası <code>graphicsLayer.translationY</code> ile yukarı çıkar; "Hedefler" kabı <code>Animatable&lt;Offset&gt;</code> + <code>spring</code> ile satıra gelir; ikon ease-in (yerçekimi) düşer; kap <code>scaleY</code> spring ile seker, sayaç <code>AnimatedContent</code> ile artar, kap yerine döner. Kapatınca ikon kaptan küçülerek çıkar</td><td>—</td><td>Olay bazlı</td></tr>
+      <tr><td>Işık hattı yayı</td><td>Statik · durum değişince 400 ms renk/kesik geçişi</td><td><code>Canvas</code> + <code>Path.cubicTo</code>, <code>Brush.linearGradient</code>; hale = aynı yol geniş, düşük alfa; noktalar <code>PathEffect.stampedPathEffect</code> (sabit faz); hata = kesik dash dizisi</td><td>XAML <code>Path</code> (BezierSegment) + <code>LinearGradientBrush</code>, <code>StrokeDashArray</code> sabit</td><td>Sıfıra yakın · yalnız durum değişince yeniden çizilir</td></tr>
+      <tr><td>Uçan tuş kapakçığı</td><td>Olay · tuş, en çok 4/sn, 700 ms, ekranda en çok 4</td><td><code>PathMeasure.getPosition</code> + tuş başına <code>Animatable</code>; <code>drawRoundRect</code> + <code>TextMeasurer</code>; ekran görünür değilse hiç başlatma</td><td>Kapakçık <code>Border</code>'ın Visual'ı; konum <code>ExpressionAnimation</code> ile ikinci derece Bezier formülü, ilerleme <code>ScalarKeyFrameAnimation</code>. (<code>CompositionPath</code> <code>IGeometrySource2D</code> ister, Win2D'siz kurulum <span class="uv">doğrulanmadı</span>)</td><td>Yalnız yazarken; kare döngüsü uçuş bitince durur. Alternatif: yalnız statik "son tuşlar" şeridi</td></tr>
+      <tr><td>Varış ışık patlaması</td><td>Olay · uçuş bitişi, 400 ms</td><td><code>drawCircle</code> yarıçap + alfa <code>Animatable</code>, kıvılcımlar <code>drawLine</code></td><td><code>CreateShapeVisual</code> + <code>CreateEllipseGeometry</code>, Scale/Opacity keyframe</td><td>Düşük</td></tr>
+      <tr><td>Durum zemini (mesh gradyan)</td><td>Statik · durum değişince 400 ms renk geçişi</td><td><code>Modifier.drawBehind</code> içinde 3 × <code>Brush.radialGradient</code>, sabit merkezler; renk <code>animateColorAsState</code>. Bulanıklık gerekmez</td><td>Pencere <code>MicaBackdrop</code>; üstünde <code>RadialGradientBrush</code>; renk değişiminde <code>CreateColorKeyFrameAnimation</code></td><td>Sıfıra yakın</td></tr>
+      <tr><td>Grain dokusu</td><td>Statik</td><td>Küçük gürültü PNG + <code>ImageShader</code>(TileMode.Repeated) → <code>ShaderBrush</code>, alfa 0,07</td><td>Büyük (512 px) gürültü PNG, <code>Image</code> düşük opaklık; döşeme yok (BorderEffect Win2D ister)</td><td>Sıfıra yakın</td></tr>
+      <tr><td>Şekil değiştiren rozet</td><td>Olay · durum değişimi, 400 ms</td><td><code>MaterialShapes.Cookie9Sided</code> → <code>Circle</code> → <code>Cookie4Sided</code> → <code>Diamond</code>; <code>Morph</code> + <code>toPath</code>, ilerleme <code>animateFloatAsState(spring)</code> (sınıflar material3 1.5.0-beta01 jar'ında var; API Expressive/deneysel)</td><td>Gerçek morph yok: <code>CompositionRoundedRectangleGeometry.CornerRadius</code> spring (<code>CreateSpringScalarAnimation</code>) ile yaklaşık</td><td>Düşük</td></tr>
+      <tr><td>İkon seti + logo</td><td>Statik · logo yalnız dokununca basılır</td><td>Vektör çizilebilirler (VectorDrawable), 2 px çizgi; logo izometrik tuş üç yüzey</td><td><code>PathIcon</code> / <code>FontIcon</code>; logo XAML <code>Path</code> üç yüzey</td><td>Sıfır</td></tr>
+      <tr><td>Sayarak gelen sayılar</td><td>Olay · sayfa ilk görünüm, bir kez 900 ms</td><td><code>animateIntAsState</code>/<code>Animatable</code>; JetBrains Mono zaten eş genişlik</td><td><code>DispatcherQueueTimer</code> ile <code>TextBlock.Text</code> ~30 adım</td><td>Tek seferlik</td></tr>
+      <tr><td>Gecikme grafiği + p50/p99</td><td>Statik · yeni veri gelince yeniden çizim (sayfa açıkken)</td><td><code>Canvas</code> cubicTo yolu; alan <code>Brush.verticalGradient</code>; p50/p99 <code>dashPathEffect</code></td><td><code>Path</code> (PathGeometry) veriden kurulur; animasyon yok</td><td>Düşük · kayma animasyonu yok</td></tr>
+      <tr><td>Sırayla giriş</td><td>Olay · sayfa/kart girişi, 380 ms + 50 ms aralık</td><td><code>AnimatedVisibility</code> + indeks gecikmesi; listede <code>Modifier.animateItem</code></td><td><code>EntranceThemeTransition</code> <code>IsStaggeringEnabled</code></td><td>Tek seferlik</td></tr>
+      <tr><td>Paylaşılan öğe</td><td>Olay · PC seçimi/sayfa geçişi, 380 ms</td><td><code>SharedTransitionLayout</code> + <code>Modifier.sharedElement</code> (projede kullanılıyor)</td><td><code>ConnectedAnimationService</code>; menü göstergesi NavigationView'da yerleşik</td><td>Tek seferlik</td></tr>
+      <tr><td>QR tarama ışını</td><td>Sayfa açıkken · tarama ekranı / Eşleştir sayfası</td><td>Kamera önizlemesi üstünde <code>drawRect</code> gradyan translationY; ekran kapanınca durur</td><td>QR üstünde <code>Rectangle</code> + <code>TranslateTransform</code> Storyboard; sayfadan çıkınca <code>Stop()</code></td><td>Kısa süreli (kod 5 dk geçerli)</td></tr>
+      <tr><td>QR giriş</td><td>Olay · sayfa açılışı / Yeni kod</td><td>—</td><td>QRCoder bitmap'i tek <code>Image</code>; Opacity+Scale (modül başına öğe yapma)</td><td>Tek seferlik</td></tr>
+      <tr><td>Kimlik kodu çözülme</td><td>Olay · bir kez, ~500 ms</td><td><code>LaunchedEffect</code> içinde 45 ms adımlarla metin; <code>semantics</code> son değeri okur</td><td><code>DispatcherQueueTimer</code>; <code>AutomationProperties.Name</code> son değer</td><td>Tek seferlik · karşılaştırma son değerle</td></tr>
+      <tr><td>Geri sayım halkası</td><td>Sayfa açıkken · 1 sn'de bir değer</td><td><code>CircularProgressIndicator(progress)</code> ya da <code>drawArc</code></td><td><code>ProgressRing</code> (IsIndeterminate=false, Value)</td><td>Düşük · en çok 5 dk</td></tr>
+      <tr><td>Basma etkileşimi</td><td>Olay · basma, ≤ 300 ms</td><td><code>collectIsPressedAsState</code> → <code>graphicsLayer</code> scale + köşe yarıçapı <code>animateDpAsState</code></td><td>PointerPressed → Visual.Scale spring</td><td>Olay bazlı</td></tr>
+      <tr><td>Cam / akrilik kart</td><td>Statik</td><td>Yarı saydam yüzey; arka plan bulanıklığı yok (<code>BlurEffect</code> API 31+). API 30'da da aynı görünür</td><td><code>AcrylicBrush</code> yalnız büyük yüzeylerde; liste öğelerinde düz katman</td><td>Akrilik GPU'ya pahalı, az kullan</td></tr>
+      <tr><td>Tepsi simgesi + menü</td><td>Statik · durum değişince ikon değişir</td><td>—</td><td>H.NotifyIcon <code>TaskbarIcon.Icon</code> 3 ICO (mevcut kod), <code>ContextFlyout</code> MenuFlyout: KeyRelay'i aç / Çıkış</td><td>Sıfır</td></tr>
+      <tr><td>Animasyonları azalt</td><td>Sistem ayarı</td><td><code>Settings.Global.ANIMATOR_DURATION_SCALE</code> = 0 ise tüm geçişler anında</td><td><code>UISettings.AnimationsEnabled</code> (projede <code>Ui.AnimationsEnabled</code>)</td><td>—</td></tr>
+    </tbody>
+  </table>
+  </div>
+  <p class="foot">Sınıf/metot adları yerel paketlerde doğrulandı: material3 1.5.0-beta01 (MaterialShapes, WavyProgressIndicator, LoadingIndicator), ui-graphics 1.12.1 (PathMeasure.getPosition/getTangent, PathEffect.stampedPathEffect, BlurEffect, ImageShader), graphics-shapes 1.0.1 (Morph), WindowsAppSDK winmd (MicaBackdrop, DesktopAcrylicBackdrop, AcrylicBrush, RadialGradientBrush, Compositor.Create*Animation, CompositionRoundedRectangleGeometry, EntranceThemeTransition.IsStaggeringEnabled, ConnectedAnimationService, ProgressRing). <span class="uv">doğrulanmadı</span> işaretliler denenmedi.</p>
+</section>
+
+<script>
+const RM=matchMedia('(prefers-reduced-motion: reduce)').matches;
+const $=(s,r=document)=>r.querySelector(s),$$=(s,r=document)=>[...r.querySelectorAll(s)];
+const NS='http://www.w3.org/2000/svg';
+const SPRING='cubic-bezier(.2,1.5,.35,1)';
+const fmt=n=>String(n).replace(/\B(?=(\d{3})+(?!\d))/g,' ');
+const dec=(v,d)=>v.toFixed(d).replace('.',',');
+
+/* ---------- icons ---------- */
+const IC={
+ tab:'<rect x="4" y="2" width="16" height="20" rx="2.5"/><path d="M11 18h2"/>',
+ pc:'<rect x="3" y="4" width="18" height="12" rx="2"/><path d="M8 20h8M12 16v4"/>',
+ sliders:'<path d="M4 7h10M18 7h2M4 17h4M12 17h8"/><circle cx="16" cy="7" r="2"/><circle cx="10" cy="17" r="2"/>',
+ arrow:'<path d="M5 12h13M13 6l6 6-6 6"/>',check:'<path d="M5 12.5l4.5 4.5L19 7"/>',
+ dots:'<path d="M6 12h.01M12 12h.01M18 12h.01" stroke-width="3.4"/>',bang:'<path d="M12 6v7M12 17.5v.5" stroke-width="3"/>',
+ lock:'<rect x="5" y="11" width="14" height="9" rx="2"/><path d="M8 11V8a4 4 0 0 1 8 0v3"/>',
+ arrows:'<path d="M4 9h13l-3-3M20 15H7l3 3"/>',
+ scan:'<path d="M3 7V5a2 2 0 0 1 2-2h2M17 3h2a2 2 0 0 1 2 2v2M21 17v2a2 2 0 0 1-2 2h-2M7 21H5a2 2 0 0 1-2-2v-2M7 12h10"/>',
+ pulse:'<path d="M3 12h4l3-7 4 14 3-7h4"/>',
+ qr:'<path d="M4 4h6v6H4zM14 4h6v6h-6zM4 14h6v6H4zM14 14h2v2h-2zM18 18h2v2h-2zM18 14h2M14 18h2"/>',
+ globe:'<circle cx="12" cy="12" r="9"/><path d="M3 12h18M12 3c3 3.5 3 14.5 0 18M12 3c-3 3.5-3 14.5 0 18"/>',
+ list:'<path d="M9 6h11M9 12h11M9 18h11M4 6h.01M4 12h.01M4 18h.01"/>',
+ open:'<rect x="3" y="4" width="18" height="16" rx="2"/><path d="M3 9h18"/>',power:'<path d="M12 3v8M6.3 6.3a8 8 0 1 0 11.4 0"/>',
+ chev:'<path d="M6 15l6-6 6 6"/>',wifi:'<path d="M2 9a15 15 0 0 1 20 0M5.5 12.5a10 10 0 0 1 13 0M9 16a5 5 0 0 1 6 0M12 19.5h.01"/>',
+ vol:'<path d="M4 9h4l5-4v14l-5-4H4zM16 9a4 4 0 0 1 0 6M19 6a8 8 0 0 1 0 12"/>',
+ kbd:'<rect x="2" y="6" width="20" height="12" rx="2"/><path d="M6 10h.01M10 10h.01M14 10h.01M18 10h.01M7 14h10"/>',
+ gauge:'<path d="M4 18a9 9 0 1 1 16 0"/><path d="M12 14l4-5"/>',
+ shield:'<path d="M12 3l8 3v6c0 5-3.5 8-8 9-4.5-1-8-4-8-9V6z"/><path d="M9 12l2 2 4-4"/>',
+ fp:'<path d="M12 11v3a8 8 0 0 1-2 5M8 10a4 4 0 0 1 8 0v2M5 13a7 7 0 0 1 .5-6M18.5 7A7 7 0 0 1 19 13c0 2-.4 4-1 5.5M12 3a9 9 0 0 1 4 1"/>',
+ plug:'<path d="M9 2v5M15 2v5M6 7h12v4a6 6 0 0 1-12 0zM12 17v5"/>',
+ route:'<circle cx="6" cy="19" r="2"/><circle cx="18" cy="5" r="2"/><path d="M8 19h7a3.5 3.5 0 0 0 0-7H9a3.5 3.5 0 0 1 0-7h7"/>',
+ user:'<circle cx="12" cy="8" r="4"/><path d="M4 21a8 8 0 0 1 16 0"/>',
+ tunnel:'<path d="M3 20V11a9 9 0 0 1 18 0v9M7 20v-8a5 5 0 0 1 10 0v8M3 20h18"/>',
+ app:'<rect x="3" y="3" width="18" height="18" rx="5"/><path d="M8 12h8M12 8v8"/>',
+ play:'<path d="M7 5l12 7-12 7z"/>',refresh:'<path d="M20 11a8 8 0 1 0-2.3 5.7M20 4v7h-7"/>',pause:'<path d="M9 6v12M15 6v12" stroke-width="3"/>'
+};
+const kic=k=>`<span class="kic">${ic(k,18)}</span>`;
+const ic=(k,s=20)=>`<svg width="${s}" height="${s}" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">${IC[k]}</svg>`;
+const icG=k=>`<g fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">${IC[k]}</g>`;
+
+/* ---------- logo: isometric keycap (top face = square through iso matrix) ---------- */
+const logo=mono=>`<svg class="logo${mono?' mono':''}" viewBox="0 0 64 64" aria-hidden="true"><ellipse class="lg-ring" cx="32" cy="42" rx="26" ry="13"/><path class="lg-l" d="M8 26 32 38V50L8 38Z"/><path class="lg-r" d="M56 26 32 38V50L56 38Z"/><g class="lg-top"><g transform="matrix(1 .5 -1 .5 32 14)"><rect class="lg-f" width="24" height="24" rx="5"/><path class="lg-a" d="M6 12h11M13 8l4 4-4 4"/></g></g></svg>`;
+const TRAY={
+ ok:'<svg viewBox="0 0 16 16"><path d="M8 1.5 14 4.5 8 7.5 2 4.5Z" fill="#F2F6FF"/><path d="M2 4.5 8 7.5V11L2 8Z" fill="#9FB4FF"/><path d="M14 4.5 8 7.5V11l6-3Z" fill="#6F8BEA"/><circle cx="12.4" cy="12.4" r="3" fill="#2FD49C" stroke="#121722" stroke-width="1.2"/></svg>',
+ wait:'<svg viewBox="0 0 16 16"><path d="M8 1.5 14 4.5 8 7.5 2 4.5ZM2 4.5 8 7.5V11L2 8ZM14 4.5 8 7.5V11l6-3Z" fill="none" stroke="#9AA8C0" stroke-width="1" stroke-linejoin="round"/><circle cx="12.4" cy="12.4" r="2.4" fill="#121722" stroke="#F2B544" stroke-width="1.6"/></svg>',
+ err:'<svg viewBox="0 0 16 16"><path d="M8 1.5 14 4.5 8 7.5 2 4.5ZM2 4.5 8 7.5V11L2 8ZM14 4.5 8 7.5V11l6-3Z" fill="#5E6C8C" opacity=".7"/><circle cx="12.4" cy="12.4" r="3.2" fill="#FF6B6B"/><path d="M11 11l2.8 2.8M13.8 11 11 13.8" stroke="#fff" stroke-width="1.2" stroke-linecap="round"/></svg>'
+};
+function hydrate(root){
+  $$('[data-logo]',root).forEach(e=>{if(!e.firstChild)e.innerHTML=logo(e.dataset.logo==='mono')});
+  $$('[data-ic]',root).forEach(e=>{if(!e.firstChild)e.innerHTML=ic(e.dataset.ic)});
+  $$('[data-tray]',root).forEach(e=>e.innerHTML=TRAY[e.dataset.tray]);
+  $$('[data-wave]',root).forEach(e=>{if(!e.firstChild){const[s,m]=e.dataset.wave.split(',');e.innerHTML=m==='mini'?waveSVG(+s,{w:200,h:46,max:6}):waveSVG(+s,{p50:.4,p99:1.6})}});
+  $$('[data-arc]',root).forEach(e=>{if(!e.firstChild){const[w,h,a,b]=e.dataset.arc.split(',');e.innerHTML=arcSVG(+w,+h,a,b)}});
+  $$('[data-morph]',root).forEach(e=>setMorph(e,e.closest('[data-s]')?.dataset.s||'relay'));
+  $$('.stag',root).forEach(s=>[...s.children].forEach((c,i)=>c.style.setProperty('--i',i)));
+  $$('[data-to],.stag',root).forEach(e=>io2.observe(e));
+  $$('.arc-host',root).forEach(mountArc);
+}
+
+/* ---------- shape morph: same vertex count so clip-path interpolates ---------- */
+const SH={relay:t=>1+.075*Math.cos(9*t),ready:()=>1,
+ connecting:t=>.9*Math.pow(Math.abs(Math.cos(t))**4+Math.abs(Math.sin(t))**4,-.25),
+ error:t=>1/(Math.abs(Math.cos(t))+Math.abs(Math.sin(t))),
+ paused:t=>.98/Math.hypot(Math.cos(t),Math.sin(t)/.62)};
+const poly=k=>'polygon('+Array.from({length:60},(_,i)=>{const t=i/60*2*Math.PI,r=46*SH[k](t);return`${(50+r*Math.cos(t)).toFixed(1)}% ${(50+r*Math.sin(t)).toFixed(1)}%`}).join(',')+')';
+const GLY={relay:'arrow',ready:'check',connecting:'dots',error:'bang',paused:'pause',verify:'dots'};
+function setMorph(el,k){
+  if(!el.firstChild)el.innerHTML='<i class="m-shape"></i><i class="m-glyph"></i>';
+  el.firstChild.style.clipPath=poly(k);const g=el.lastChild;g.innerHTML=ic(GLY[k]);
+  if(!RM)g.animate([{transform:'scale(.4) rotate(-40deg)',opacity:0},{transform:'none',opacity:1}],{duration:300,easing:SPRING});
+}
+
+/* ---------- relay arc ---------- */
+let arcN=0;
+function arcSVG(w,h,src,dst){
+  const n=++arcN,y=h-58,x0=78,x1=w-78,d=`M${x0+44} ${y-4} C ${w*.3} ${-h*.18}, ${w*.7} ${-h*.18}, ${x1-44} ${y-4}`;
+  const node=(cls,x,k)=>`<g class="a-node ${cls}" transform="translate(${x} ${y})"><circle class="a-ring" r="44"/><g class="a-body"><rect class="a-bg" x="-36" y="-36" width="72" height="72" rx="24"/><g class="a-ic" transform="translate(-17 -17) scale(1.42)">${icG(k)}</g></g></g>`;
+  return `<svg class="arc" viewBox="0 0 ${w} ${h}" aria-hidden="true"><defs><linearGradient id="ag${n}" x1="0" x2="1"><stop offset="0" style="stop-color:var(--a2)"/><stop offset=".5" style="stop-color:var(--a1)"/><stop offset="1" style="stop-color:var(--a3)"/></linearGradient><filter id="af${n}" x="-20%" y="-60%" width="140%" height="220%"><feGaussianBlur stdDeviation="8"/></filter></defs>
+<path class="a-halo" d="${d}" stroke="url(#ag${n})" filter="url(#af${n})" pathLength="100"/><path class="a-core" d="${d}" stroke="url(#ag${n})" pathLength="100"/><path class="a-flow" d="${d}" pathLength="100"/>
+<g class="a-still"></g><g class="a-keys"></g>
+${node('a-src',x0,src)}${node('a-dst',x1,dst)}<g class="a-burst" transform="translate(${x1} ${y})"></g>
+<g class="a-park" transform="translate(${x0} ${y-62})">${capMarkup('A')}</g><g class="a-x"><circle r="13"/><path d="M-5-5 5 5M5-5-5 5"/></g><g class="a-q"><circle r="13"/><path d="M-4.5 0h.01M0 0h.01M4.5 0h.01"/></g></svg>`;
+}
+function capMarkup(g){const w=Math.max(32,14+g.length*8.5);return`<rect class="kc-s" x="${-w/2}" y="-12" width="${w}" height="29" rx="8"/><rect class="kc-t" x="${-w/2}" y="-16" width="${w}" height="27" rx="8"/><text class="kc-g" y="-2">${g}</text>`}
+/* Keycap flight runs only on a key event, throttled; the frame loop stops as soon as no key is in flight. */
+const FLIGHT_MS=700,MIN_GAP_MS=250,MAX_IN_FLIGHT=4;
+const ARCS=new Set();let raf=0,lastFire=0;
+const io=new IntersectionObserver(es=>{for(const e of es){const a=$('svg.arc',e.target)?.__arc;if(a)a.vis=e.isIntersecting}},{threshold:.05});
+function mountArc(host){
+  const svg=$('svg.arc',host);if(!svg||svg.__arc)return;
+  const p=$('.a-core',svg),L=p.getTotalLength(),m=p.getPointAtLength(L/2),mid=`translate(${m.x.toFixed(1)} ${m.y.toFixed(1)})`;
+  $('.a-x',svg).setAttribute('transform',mid);$('.a-q',svg).setAttribute('transform',mid);
+  const a={host,svg,p,L,keys:[],vis:false,kg:$('.a-keys',svg),bg:$('.a-burst',svg),body:$('.a-dst .a-body',svg)};
+  ['Alt','Tab','A'].forEach((g,i)=>{const pt=p.getPointAtLength(L*(.3+i*.2)),el=document.createElementNS(NS,'g');
+    el.setAttribute('class','kc');el.setAttribute('transform',`translate(${pt.x.toFixed(1)} ${pt.y.toFixed(1)}) scale(${(.8+i*.1).toFixed(2)})`);el.innerHTML=capMarkup(g);$('.a-still',svg).append(el)});
+  svg.__arc=a;ARCS.add(a);io.observe(host);
+}
+function spawn(a,g,now){
+  const el=document.createElementNS(NS,'g'),tr=document.createElementNS(NS,'path');
+  el.setAttribute('class','kc');el.innerHTML=capMarkup(g);el.style.opacity=0;
+  tr.setAttribute('class','kc-trail');tr.setAttribute('d',a.p.getAttribute('d'));tr.style.strokeDasharray=`0 ${a.L+300}`;
+  a.kg.append(tr,el);a.keys.push({el,tr,t0:now});
+}
+function burst(a){
+  const b=a.bg,c=document.createElementNS(NS,'circle');c.setAttribute('r','16');c.setAttribute('class','b-ring');b.append(c);
+  c.animate([{transform:'scale(.3)',opacity:1},{transform:'scale(2.6)',opacity:0}],{duration:400,easing:'cubic-bezier(.2,.8,.2,1)'}).onfinish=()=>c.remove();
+  for(let i=0;i<7;i++){const an=(-90+(i-3)*26)*Math.PI/180,cx=Math.cos(an),sy=Math.sin(an),l=document.createElementNS(NS,'line');
+    l.setAttribute('class','b-spark');l.setAttribute('x1',(cx*38).toFixed(1));l.setAttribute('y1',(sy*38).toFixed(1));l.setAttribute('x2',(cx*46).toFixed(1));l.setAttribute('y2',(sy*46).toFixed(1));b.append(l);
+    l.animate([{transform:'translate(0,0)',opacity:1},{transform:`translate(${cx*20}px,${sy*20}px)`,opacity:0}],{duration:350,easing:'ease-out'}).onfinish=()=>l.remove()}
+  a.body.animate([{transform:'scale(1)'},{transform:'scale(1.12)'},{transform:'scale(1)'}],{duration:300,easing:SPRING});
+}
+function frame(now){raf=0;let busy=false;
+  for(const a of ARCS){if(!a.svg.isConnected){ARCS.delete(a);continue}
+    for(let i=a.keys.length-1;i>=0;i--){const k=a.keys[i],t=(now-k.t0)/FLIGHT_MS;
+      if(t>=1){k.el.remove();k.tr.remove();a.keys.splice(i,1);burst(a);continue}
+      const e=t<.5?4*t*t*t:1-Math.pow(-2*t+2,3)/2,d=e*a.L,pt=a.p.getPointAtLength(d),sc=.72+.42*Math.sin(Math.PI*t),T=Math.min(110,d);
+      k.el.setAttribute('transform',`translate(${pt.x.toFixed(1)} ${pt.y.toFixed(1)}) scale(${sc.toFixed(3)})`);
+      k.el.style.opacity=Math.min(1,t*7);k.tr.style.strokeDasharray=`${T.toFixed(1)} ${a.L+300}`;k.tr.style.strokeDashoffset=(T-d).toFixed(1)}
+    if(a.keys.length)busy=true}
+  if(busy)raf=requestAnimationFrame(frame)}
+/* one key event: counters/strips always update; flight only on visible arcs in relay state */
+function fire(g){const now=performance.now();if(now-lastFire<MIN_GAP_MS)return;lastFire=now;
+  $('#m-count').textContent=fmt(++mcount);hitCap($('#a-key'),g);onWinKey(g);
+  if(RM)return;
+  for(const a of ARCS)if(a.vis&&a.host.dataset.s==='relay'&&a.keys.length<MAX_IN_FLIGHT)spawn(a,g,now);
+  if(!raf)raf=requestAnimationFrame(frame)}
+function hitCap(el,g){if(!el)return;el.textContent=g;el.classList.add('hit');setTimeout(()=>el.classList.remove('hit'),150)}
+const KEYNAME={' ':'Space',Enter:'⏎',Backspace:'⌫',Escape:'Esc',Shift:'⇧',Control:'Ctrl',Meta:'Win',ArrowLeft:'←',ArrowRight:'→',ArrowUp:'↑',ArrowDown:'↓'};
+document.addEventListener('keydown',e=>{if(e.target.closest('input,textarea'))return;const g=KEYNAME[e.key]||(e.key.length===1?e.key.toUpperCase():e.key.slice(0,4));fire(g)});
+const DEMO=['Alt','Tab','Ctrl','A','Win','⏎','K','Esc'];let demoI=0;
+
+/* ---------- latency wave: static drawing, redrawn only when new data arrives ---------- */
+function waveSVG(seed,{w=360,h=96,max=2,p50,p99}={}){
+  let r=seed*977;const rnd=()=>(r=(r*9301+49297)%233280)/233280,n=18,v=[];
+  for(let i=0;i<n;i++)v.push(i%7===3?max*.55+rnd()*max*.25:max*(.12+rnd()*.22));
+  const step=w/n,Y=x=>(h-6-(x/max)*(h-14)).toFixed(1),P=[];
+  for(let i=-1;i<=2*n+1;i++)P.push([i*step,+Y(v[(i%n+n)%n])]);
+  let d=`M0 ${P[1][1]}`;
+  for(let i=1;i<=2*n;i++){const[p0,p1,p2,p3]=[P[i-1],P[i],P[i+1],P[i+2]];
+    d+=` C${(p1[0]+(p2[0]-p0[0])/6).toFixed(1)} ${(p1[1]+(p2[1]-p0[1])/6).toFixed(1)} ${(p2[0]-(p3[0]-p1[0])/6).toFixed(1)} ${(p2[1]-(p3[1]-p1[1])/6).toFixed(1)} ${p2[0].toFixed(1)} ${p2[1]}`}
+  const id='wg'+(++arcN),lines=p50==null?'':`<line class="w-p" x1="0" x2="${w}" y1="${Y(p50)}" y2="${Y(p50)}"/><text class="w-pt" x="${w-4}" y="${Y(p50)-4}" text-anchor="end">p50</text><line class="w-p" x1="0" x2="${w}" y1="${Y(p99)}" y2="${Y(p99)}"/><text class="w-pt" x="${w-4}" y="${Y(p99)-4}" text-anchor="end">p99</text>`;
+  return `<svg class="wave" viewBox="0 0 ${w} ${h}" aria-hidden="true"><defs><linearGradient id="${id}" x1="0" y1="0" x2="0" y2="1"><stop offset="0" style="stop-color:var(--a2);stop-opacity:.45"/><stop offset="1" style="stop-color:var(--a2);stop-opacity:0"/></linearGradient></defs><path d="${d} L${2*w} ${h} L0 ${h}Z" fill="url(#${id})"/><path class="w-line" d="${d}"/>${lines}<circle class="w-now" cx="${w-4}" cy="${Y(v[0])}" r="4.5"/></svg>`;
+}
+
+/* ---------- count-up, stagger trigger ---------- */
+function countUp(el){const to=parseFloat(el.dataset.to),dd=+(el.dataset.dec||0),out=x=>el.textContent=dd?dec(x,dd):fmt(Math.round(x));
+  if(RM){out(to);el.dataset.done=1;return}const t0=performance.now();
+  (function f(now){const t=Math.min(1,(now-t0)/900);out(to*(1-Math.pow(1-t,4)));if(t<1)requestAnimationFrame(f);else el.dataset.done=1})(t0)}
+const io2=new IntersectionObserver(es=>es.forEach(e=>{if(!e.isIntersecting)return;const t=e.target;io2.unobserve(t);
+  if(t.dataset.to!==undefined)countUp(t);if(t.classList.contains('stag'))t.classList.add('in')}),{threshold:.15});
+
+/* ---------- PC identity scramble (base32 only) ---------- */
+const B32='ABCDEFGHIJKLMNOPQRSTUVWXYZ234567';
+const cells=code=>[...code].map(c=>c==='-'?'<span class="dash" aria-hidden="true">-</span>':`<span aria-hidden="true">${c}</span>`).join('');
+function scramble(box,code){box.setAttribute('aria-label',code);const sp=$$('span',box);if(RM)return;
+  const t0=performance.now();clearInterval(box.__t);
+  box.__t=setInterval(()=>{const t=performance.now()-t0;let all=true;
+    sp.forEach((s,i)=>{if(code[i]==='-')return;const lockAt=80+i*50;
+      if(t<lockAt){s.textContent=B32[Math.random()*32|0];all=false}else if(s.textContent!==code[i]||!s.dataset.l){s.textContent=code[i];if(!s.dataset.l){s.dataset.l=1;s.classList.add('lock')}}});
+    if(all){clearInterval(box.__t);sp.forEach(s=>{delete s.dataset.l;s.classList.remove('lock')})}},45)}
+
+/* ---------- state application ---------- */
+/* ---------- choreography helpers: every scene starts from a user action and ends static ---------- */
+const VIO='#8B5CF6';
+const wait=ms=>RM?Promise.resolve():new Promise(r=>setTimeout(r,ms));
+const A=(el,kf,o)=>RM||!el?Promise.resolve():el.animate(kf,{fill:'forwards',easing:'cubic-bezier(.2,.8,.2,1)',...o}).finished;
+const rel=(el,st)=>{const r=el.getBoundingClientRect(),s=st.getBoundingClientRect();return{x:r.left-s.left,y:r.top-s.top,w:r.width,h:r.height}};
+function mk(cls,parent,html=''){const e=document.createElement('div');e.className=cls;e.innerHTML=html;parent.append(e);return e}
+async function swapText(el,txt){if(!el)return;if(RM){el.textContent=txt;return}
+  await A(el,[{opacity:1,transform:'none'},{opacity:0,transform:'translateY(-6px)'}],{duration:140});el.textContent=txt;
+  await A(el,[{opacity:0,transform:'translateY(8px)'},{opacity:1,transform:'none'}],{duration:240})}
+function fadeUp(el){if(!el)return;el.hidden=false;el.style.visibility='';el.style.opacity='';A(el,[{opacity:0,transform:'translateY(14px)'},{opacity:1,transform:'none'}],{duration:320,easing:SPRING})}
+const CHECK='<svg viewBox="0 0 24 24" width="18" height="18"><path pathLength="1" d="M5 12.5l4.5 4.5L19 7"/></svg>';
+/* Code -> circuit -> verified -> one card. Phases: lift, verify, ok, done. Particles are a fixed 16, one shot. */
+async function fold(stage,srcs,{cols=4,cx,cy,icon='pc',from=null,onPhase=()=>{}}={}){
+  const box=srcs[0].parentElement,code=box.getAttribute('aria-label');clearInterval(box.__t);
+  if(code)srcs.forEach((s,i)=>{s.textContent=code.replace('-','')[i];s.classList.remove('lock')});
+  const fx=mk('fx',stage),S=stage.getBoundingClientRect();cx??=S.width/2;cy??=S.height/2;
+  const tgt=mk('ftarget',fx,ic(icon,36)+`<span class="bdg">${CHECK}</span>`);tgt.style.left=cx-40+'px';tgt.style.top=cy-40+'px';
+  if(RM){srcs.forEach(s=>s.style.visibility='hidden');['lift','verify','ok','done'].forEach(onPhase);$('.bdg path',tgt).style.strokeDashoffset=0;return{fx,tgt}}
+  tgt.style.opacity=0;const ck=$('.bdg path',tgt);ck.style.strokeDashoffset=1;
+  const r0=rel(srcs[0],stage),w=r0.w,h=r0.h,g=18,n=srcs.length,rows=Math.ceil(n/cols);
+  const G=i=>({x:cx+((i%cols)-(cols-1)/2)*(w+g)-w/2,y:cy+((i/cols|0)-(rows-1)/2)*(h+g)-h/2});
+  /* from: caps are born at that element's centre (e.g. QR modules collapsing into the code) */
+  const F=from&&rel(from,stage);
+  const caps=srcs.map(s=>{const r=F?{x:F.x+F.w/2-w/2,y:F.y+F.h/2-h/2,w,h}:rel(s,stage),c=mk('fly',fx),cs=getComputedStyle(s);c.textContent=s.textContent;
+    Object.assign(c.style,{left:r.x+'px',top:r.y+'px',width:r.w+'px',height:r.h+'px',fontSize:cs.fontSize,borderRadius:cs.borderRadius});s.style.visibility='hidden';return c});
+  onPhase('lift');
+  await Promise.all(caps.map((c,i)=>{const p=G(i),dx=p.x-parseFloat(c.style.left),dy=p.y-parseFloat(c.style.top);
+    return A(c,[{transform:F?'scale(.2)':'none',opacity:F?0:1},{transform:`translate(${dx*.5}px,${dy*.5-30}px) rotate(${i%2?9:-9}deg) scale(1.1)`,offset:.5},{transform:`translate(${dx}px,${dy}px)`}],{duration:460,delay:i*35,easing:SPRING})}));
+  caps.forEach((c,i)=>{const p=G(i);c.getAnimations().forEach(a=>a.cancel());c.style.left=p.x+'px';c.style.top=p.y+'px';c.classList.add('busy')});
+  onPhase('verify');
+  const order=[];for(let c=0;c<cols-1;c++)order.push([c,c+1,'h']);for(let c=0;c<cols&&c+cols<n;c++)order.push([c,c+cols,'v']);for(let c=cols;c<n-1;c++)if((c+1)%cols)order.push([c,c+1,'h']);
+  const svg=document.createElementNS(NS,'svg');svg.setAttribute('class','wires');fx.prepend(svg);
+  const lines=order.map(([a,b,t])=>{const P1=G(a),P2=G(b),l=document.createElementNS(NS,'line'),at=(k,v)=>l.setAttribute(k,v.toFixed(1));
+    if(t==='h'){at('x1',P1.x+w);at('x2',P2.x);at('y1',P1.y+h/2);at('y2',P2.y+h/2)}else{at('x1',P1.x+w/2);at('x2',P1.x+w/2);at('y1',P1.y+h);at('y2',P2.y)}
+    l.setAttribute('pathLength','1');svg.append(l);return l});
+  await Promise.all(lines.map((l,k)=>A(l,[{strokeDashoffset:1},{strokeDashoffset:0}],{duration:220,delay:k*45})));
+  onPhase('ok');
+  caps.forEach((c,i)=>setTimeout(()=>{c.classList.replace('busy','ok');order.forEach((o,k)=>{if(o[1]===i)lines[k].classList.add('ok')})},i*45));
+  await wait(n*45+220);
+  A(svg,[{opacity:1},{opacity:0}],{duration:200});
+  caps.forEach((c,i)=>{const dx=cx-(parseFloat(c.style.left)+w/2),dy=cy-(parseFloat(c.style.top)+h/2);
+    A(c,[{transform:'none',opacity:1},{transform:`translate(${dx}px,${dy}px) rotate(${i%2?140:-140}deg) scale(.2)`,opacity:0}],{duration:420,delay:i*22,easing:'cubic-bezier(.55,0,.25,1)'})});
+  await wait(330);tgt.style.opacity=1;
+  await A(tgt,[{transform:'scale(0) rotate(-90deg)'},{transform:'scale(1.15) rotate(6deg)',offset:.6},{transform:'none'}],{duration:440,easing:'cubic-bezier(.2,1.2,.4,1)'});
+  caps.forEach(c=>c.remove());svg.remove();
+  onPhase('done');
+  const ring=mk('ring2',fx);Object.assign(ring.style,{left:cx-40+'px',top:cy-40+'px'});
+  A(ring,[{transform:'scale(1)',opacity:.9},{transform:'scale(2.6)',opacity:0}],{duration:520}).then(()=>ring.remove());
+  for(let i=0;i<16;i++){const p=mk('pt'+(i%3?'':' w'),fx),an=i/16*6.283+.2,R=70+(i%3)*18;p.style.left=cx-3.5+'px';p.style.top=cy-3.5+'px';
+    A(p,[{transform:'translate(0,0) scale(1)',opacity:1},{transform:`translate(${(Math.cos(an)*R).toFixed(1)}px,${(Math.sin(an)*R).toFixed(1)}px) scale(.3)`,opacity:0}],{duration:520,easing:'cubic-bezier(.1,.7,.3,1)'}).then(()=>p.remove())}
+  await A(ck,[{strokeDashoffset:1},{strokeDashoffset:0}],{duration:300,delay:120});ck.style.strokeDashoffset=0;
+  return{fx,tgt};
+}
+/* card folds away, then the list closes the gap with a spring */
+async function foldAway(el){if(RM){el.remove();return}
+  el.style.overflow='hidden';el.style.pointerEvents='none';
+  await A(el,[{transform:'none',opacity:1},{transform:'perspective(700px) rotateX(75deg) scale(.7)',opacity:0}],{duration:300,easing:'cubic-bezier(.5,0,.75,0)'});
+  const cs=getComputedStyle(el);
+  await A(el,[{height:el.offsetHeight+'px',marginTop:cs.marginTop,paddingTop:cs.paddingTop,paddingBottom:cs.paddingBottom},{height:'0px',marginTop:'0px',paddingTop:'0px',paddingBottom:'0px'}],{duration:320,easing:SPRING});
+  el.remove()}
+/* hold keeps a result on screen; it is content timing, so it also runs with reduced motion */
+const hold=ms=>new Promise(r=>setTimeout(r,ms));
+/* ---- bin eats label: lid opens, letters (nearest first) arc into the bin, lid closes, button shrinks to a circle, one ring ---- */
+const BIN='<svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><g class="lid"><path d="M3.5 6.5h17"/><path d="M9 6.5V4h6v2.5"/></g><path d="M6 6.5l1 13.5h10l1-13.5"/><path d="M10 10.5v6M14 10.5v6"/></svg>';
+const binBtn=(label,cls,attrs)=>`<button class="${cls} binbtn" aria-label="${label}" ${attrs}><span class="bin">${BIN}</span><span class="lbl" aria-hidden="true">${[...label].map(c=>`<i><b>${c}</b></i>`).join('')}</span></button>`;
+async function eatLabel(btn,ok=true){if(!btn||btn.dataset.busy)return;btn.dataset.busy=1;
+  const lid=$('.lid',btn),bin=$('.bin',btn),ls=$$('.lbl i',btn);
+  if(RM){if(ok)btn.classList.add('eaten');else btn.classList.add('fail');delete btn.dataset.busy;return}
+  await A(lid,[{transform:'none'},{transform:'translate(-1px,-2px) rotate(-38deg)'}],{duration:180,easing:SPRING});
+  const B=bin.getBoundingClientRect();
+  await Promise.all(ls.map((o,i)=>{const r=o.getBoundingClientRect(),dx=B.left+B.width/2-(r.left+r.width/2),dy=B.top+3-(r.top+r.height/2),dl=i*55;
+    if(!ok)return A(o.firstChild,[{transform:'none',easing:'cubic-bezier(.2,.7,.4,1)'},{transform:'translateY(-14px) rotate(-25deg)',offset:.4,easing:'cubic-bezier(.6,0,.9,.6)'},{transform:'translateY(2px)',offset:.8},{transform:'none'}],{duration:480,delay:dl});
+    /* X linear, Y up then down with its own easing = a natural throw */
+    return Promise.all([A(o,[{transform:'none'},{transform:`translateX(${dx.toFixed(1)}px)`}],{duration:420,delay:dl,easing:'linear'}),
+      A(o.firstChild,[{transform:'none',opacity:1,easing:'cubic-bezier(.2,.7,.4,1)'},{transform:`translateY(${(dy-24).toFixed(1)}px) rotate(-160deg)`,offset:.45,easing:'cubic-bezier(.6,0,.9,.6)'},{transform:`translateY(${(dy+6).toFixed(1)}px) rotate(-320deg) scale(.35)`,opacity:0}],{duration:420,delay:dl})])}));
+  await A(lid,[{transform:'translate(-1px,-2px) rotate(-38deg)'},{transform:'none'}],{duration:200,easing:SPRING});
+  if(ok){btn.classList.add('eaten');A(bin,[{transform:'scaleY(.8)'},{transform:'none'}],{duration:260,easing:SPRING});
+    const R=btn.getBoundingClientRect(),l=B.left-R.left-9,t=Math.max(0,B.top-R.top-9),rr=R.right-B.right-9,bb=Math.max(0,R.bottom-B.bottom-9);
+    await A(btn,[{clipPath:'inset(0px 0px 0px 0px round 999px)'},{clipPath:`inset(${t}px ${rr}px ${bb}px ${l}px round 999px)`}],{duration:280,easing:'cubic-bezier(.3,.7,.3,1)'});
+    const ring=mk('binring',document.body),sz=B.width+18;Object.assign(ring.style,{left:B.left+scrollX-9+'px',top:B.top+scrollY-9+'px',width:sz+'px',height:sz+'px'});
+    A(ring,[{transform:'scale(1)',opacity:.9},{transform:'scale(1.9)',opacity:0}],{duration:400}).then(()=>ring.remove());await wait(260)}
+  else{btn.classList.add('fail');await A(btn,[{transform:'none'},{transform:'translateX(-6px)'},{transform:'translateX(5px)'},{transform:'translateX(-3px)'},{transform:'none'}],{duration:360})}
+  delete btn.dataset.busy}
+function resetBin(btn){if(!btn)return;btn.classList.remove('fail','eaten');btn.getAnimations({subtree:true}).forEach(a=>a.cancel())}
+/* ---- paper plane: honest wait is bound to a pending job, finished by the demo controls ---- */
+const PLANE='<svg viewBox="0 0 24 24"><path d="M2 11.5 22 2 11 13.5Z" fill="#fff"/><path d="M11 13.5 22 2 14.5 22Z" fill="#C9D6FF"/><path d="M11 13.5 9.5 19l3-3.2" fill="#9FB4FF"/></svg>';
+const RECT='polygon(0% 0%,100% 0%,100% 100%,0% 100%)',TRAP='polygon(24% 0%,76% 0%,100% 100%,0% 100%)',TRI='polygon(50% 0%,50% 0%,68% 100%,32% 100%)';
+const SIM={pending:null,timer:0,ms:()=>+($('#simms')?.value||1500)};
+function setSimUI(on){$$('.sim').forEach(s=>{s.classList.toggle('live',on);$$('[data-finish]',s).forEach(b=>b.disabled=!on)})}
+/* resolves when the simulated network job ends: by the slider time with the given outcome, or earlier by a finish button */
+function work(ok=true){return new Promise(res=>{SIM.pending=res;setSimUI(true);SIM.timer=setTimeout(()=>finishWork(ok),SIM.ms())})}
+function finishWork(ok){clearTimeout(SIM.timer);const r=SIM.pending;SIM.pending=null;setSimUI(false);r&&r(ok)}
+/* parabolic flight without a path: outer moves X linearly, inner moves Y with its own easing */
+async function throwFly(stage,from,to,html,{yEase='cubic-bezier(.2,.7,.4,1)',dur=600,rot=0,scale=1,trail=false}={}){
+  const f=rel(from,stage),t=rel(to,stage),fx=mk('fx',stage),ox=mk('tx',fx),oy=mk('ty',ox,html);
+  Object.assign(ox.style,{left:f.x+'px',top:f.y+'px',width:f.w+'px',height:f.h+'px'});Object.assign(oy.style,{width:'100%',height:'100%'});
+  const dx=t.x+t.w/2-f.x-f.w/2,dy=t.y+t.h/2-f.y-f.h/2;
+  if(trail){const x0=f.x+f.w/2,y0=f.y+f.h/2,x1=x0+dx,y1=y0+dy,d=`M${x0} ${y0} Q ${x0+dx*.4} ${y1} ${x1} ${y1}`,id='tm'+(++arcN);
+    fx.insertAdjacentHTML('afterbegin',`<svg class="trail"><defs><mask id="${id}" maskUnits="userSpaceOnUse"><path class="tm" d="${d}" pathLength="1" stroke-dasharray="1" stroke-dashoffset="1"/></mask></defs><path class="tp" d="${d}" mask="url(#${id})"/></svg>`);
+    A($('.tm',fx),[{strokeDashoffset:1},{strokeDashoffset:0}],{duration:dur,easing:'linear'})}
+  await Promise.all([A(ox,[{transform:'none'},{transform:`translateX(${dx}px)`}],{duration:dur,easing:'linear'}),
+    A(oy,[{transform:'none'},{transform:`translateY(${dy}px) rotate(${rot}deg) scale(${scale})`}],{duration:dur,easing:yEase})]);
+  return fx}
+/* element (or its clone) flies along a short arc to a target rect inside stage */
+async function flyTo(stage,fromEl,toEl,html,cls='ftarget'){const f=rel(fromEl,stage),t=rel(toEl,stage);if(RM)return;
+  const fx=mk('fx',stage),c=mk(cls,fx,html);Object.assign(c.style,{left:f.x+'px',top:f.y+'px',width:f.w+'px',height:f.h+'px'});
+  const dx=t.x-f.x+(t.w-f.w)/2,dy=t.y-f.y+(t.h-f.h)/2,s=Math.max(.15,t.w/f.w);
+  await A(c,[{transform:'none'},{transform:`translate(${dx*.5}px,${dy*.5-50}px) rotate(-10deg) scale(${((1+s)/2+.12).toFixed(2)})`,offset:.55},{transform:`translate(${dx}px,${dy}px) scale(${s.toFixed(2)})`}],{duration:560,easing:'cubic-bezier(.3,.9,.3,1.1)'});
+  fx.remove()}
+/* link line draws in (connect) or snaps in the middle and pulls back to both nodes (disconnect) */
+const LINKED=s=>s==='relay'||s==='ready'||s==='paused';
+function arcLink(h,prev,next){const svg=$('svg.arc',h);if(!svg||RM||!prev||prev===next||LINKED(prev)===LINKED(next))return;
+  svg.classList.add('nt');const ps=$$('.a-core,.a-halo',svg);
+  const kf=LINKED(next)?[{strokeDasharray:'0 100 0 0'},{strokeDasharray:'100 0 0 0'}]:[{strokeDasharray:'50 0 50 0'},{strokeDasharray:'0 100 0 0'}];
+  Promise.all(ps.map(p=>A(p,kf,{duration:LINKED(next)?620:420,easing:LINKED(next)?'cubic-bezier(.3,.7,.2,1)':'cubic-bezier(.6,0,.8,.4)'}))).then(()=>{
+    ps.forEach(p=>p.getAnimations().forEach(a=>a.cancel()));requestAnimationFrame(()=>svg.classList.remove('nt'));
+    if(LINKED(next)&&svg.__arc)burst(svg.__arc);else A($('.a-core',svg),[{opacity:0},{opacity:1}],{duration:220}).then(()=>$('.a-core',svg).getAnimations().forEach(a=>a.cancel()))})}
+function applyState(scope,k,M){const m=M[k];scope.dataset.s=k;
+  [scope,...$$('.arc-host',scope)].filter(h=>h.matches('.arc-host')).forEach(h=>{const prev=h.dataset.s;h.dataset.s=k;arcLink(h,prev,k)});
+  $$('[data-f]',scope).forEach(el=>{const v=m[el.dataset.f];if(v==null||el.textContent===v)return;el.textContent=v;
+    if(!RM&&el.dataset.f==='h')el.animate([{opacity:0,transform:'translateY(10px)'},{opacity:1,transform:'none'}],{duration:320,easing:SPRING})});
+  $$('[data-dot]',scope).forEach(d=>d.className='dot '+(m.d[+d.dataset.dot]||''));
+  $$('[data-morph]',scope).forEach(e=>setMorph(e,k));
+  $$('[data-show]',scope).forEach(e=>e.hidden=!e.dataset.show.split(' ').includes(k));
+}
+function pressSeg(seg,k){$$('button',seg).forEach(b=>b.setAttribute('aria-pressed',b.dataset.k===k))}
+
+/* ---------- Android ---------- */
+const AS={relay:{st:'Yönlendiriliyor',h:"Tuşların homepc'de",s:"TeamViewer önde · Alt+Tab, Win ve Ctrl+Alt+Del PC'ye gidiyor",c2:'Kilitli · güvenli',d:['','']},
+ ready:{st:'Hazır',h:'Klavye tablette',s:"TeamViewer'a geçince tuşlar otomatik olarak PC'ye gider",c2:'Kilitli · güvenli',d:['','']},
+ connecting:{st:'Bağlanıyor',h:'PC aranıyor…',s:'homepc.tailnet-example.ts.net:8443 · TLS el sıkışması',c2:'Kilitli · güvenli',d:['warn','off']},
+ error:{st:'Başlatılamadı',h:'Başlatılamadı',s:'Yardımcı başlamadı · 5 sn sonra yeniden başlatılıyor',c2:'Kilitli değil',d:['off','err']},
+ paused:{st:'Duraklatıldı',h:'Yönlendirme duraklatıldı',s:'Ctrl Alt ` ile sürdür · klavye tablette kalır',c2:'Kilitli · güvenli',d:['','off']}};
+const aHero=$('#a-hero');
+let mcount=0;
+const fadeOut=e=>{if(!e)return;if(RM){e.style.opacity=0;return}A(e,[{opacity:1},{opacity:0}],{duration:180})};
+function setAndroid(k){applyState(aHero,k,AS);$('#a-dev').dataset.s=k;pressSeg($('[data-seg=android]'),k);$('#a-sw').setAttribute('aria-pressed',k!=='paused')}
+/* shortcut: caps go down one after another, then the badge morphs relay <-> paused */
+let shortBusy=false;
+async function playShortcut(){if(shortBusy)return;shortBusy=true;const caps=$$('#sc-caps .kcap');
+  for(const c of caps){c.classList.add('hit');await wait(130)}await wait(160);caps.forEach(c=>c.classList.remove('hit'));
+  setAndroid(aHero.dataset.s==='paused'?'relay':'paused');shortBusy=false}
+async function playConnect(set){set('connecting');await wait(900);set('relay')}
+
+const PCS={
+ homepc:{meta:'Ev · bağlı · 3,8 ms',on:true,def:true,id:'TYIM-LHQO',fp:'sha256/Xq3…9fA',st:'Bağlı · 3,8 ms',addr:['homepc.tailnet-example.ts.net:8443','100.64.0.10:47111','192.168.1.10:47111']},
+ devpc:{meta:'Ofis · son görülme 2 sa önce',on:false,def:false,id:'QF4K-ZB7N',fp:'sha256/M7c…2Lk',st:'Bağlı değil · son görülme 2 sa önce',addr:['devpc.tailnet-example.ts.net:8443','192.168.0.40:47111']}};
+function pcDetail(n){const p=PCS[n];return`<div class="pd-head"><div class="av xl${p.on?'':' off'}" id="pd-av">${ic('pc',42)}</div><div><div class="pd-name">${n}</div>
+<div class="chips"><span class="chip"><span class="dot ${p.on?'live':'off'}"></span>${p.st}</span><span class="chip">${ic('lock',14)}TLS 1.3 · sabitlenmiş</span>${p.def?'<span class="badge">Varsayılan</span>':''}</div></div></div>
+<div class="pd-grid stag"><div class="pcard"><div class="khead">${kic('route')}<div class="k">Adresler · ilk sıradaki önce denenir</div></div><ol class="addr">${p.addr.map((a,i)=>`<li><b>${i+1}</b><span class="mono">${a}</span></li>`).join('')}</ol></div>
+<div class="pcard"><div class="khead">${kic('shield')}<div class="k">PC kimlik kodu · PC'dekiyle aynı olmalı</div></div><div class="cells" id="pd-id" style="margin-top:10px">${cells(p.id)}</div><div class="khead" style="margin-top:16px">${kic('fp')}<div class="k">Sertifika parmak izi</div></div><div class="mono fp">${p.fp}</div></div>
+<div class="pd-act"><button class="m3btn tonal press"${p.def?' disabled':''}>Varsayılan yap</button>${binBtn("PC'yi kaldır",'m3btn danger',`data-remove="${n}"`)}</div></div>`}
+let PCL=['homepc','devpc'];
+const pcCard=n=>{const p=PCS[n];return`<button class="pc" data-pc="${n}" aria-selected="false"><span class="av${p.on?'':' off'}">${ic('pc')}</span><span class="meta"><b>${n}</b><span>${p.meta}</span></span>${p.def?'<span class="badge">Varsayılan</span>':''}</button>`};
+function renderList(){$('#pclist').innerHTML=PCL.length?PCL.map(pcCard).join(''):`<p class="empty">Henüz eşlenmiş PC yok. Windows'taki KeyRelay penceresindeki QR kodu okutun.</p>`}
+function selectPc(n,fromBtn){
+  const pd=$('#pd'),from=fromBtn&&$('.av',fromBtn).getBoundingClientRect();
+  if(!n){pd.innerHTML=`<div class="pd-empty">${ic('pc',64)}</div>`;return}
+  $$('#pclist .pc').forEach(b=>b.setAttribute('aria-selected',b.dataset.pc===n));
+  pd.innerHTML=pcDetail(n);hydrate(pd);scramble($('#pd-id'),PCS[n].id);
+  if(from&&!RM){const av=$('#pd-av'),to=av.getBoundingClientRect();
+    av.animate([{transform:`translate(${from.left-to.left}px,${from.top-to.top}px) scale(${from.width/to.width})`,borderRadius:'60px'},{transform:'none',borderRadius:'32px'}],{duration:380,easing:SPRING});
+    $('.pd-name',pd).animate([{opacity:0,transform:'translateX(-24px)'},{opacity:1,transform:'none'}],{duration:340,easing:SPRING})}
+}
+$('#pclist').addEventListener('click',e=>{const b=e.target.closest('.pc');if(b&&b.getAttribute('aria-selected')!=='true')selectPc(b.dataset.pc,b)});
+const ov=$('#ov');let pairing=false;
+/* cancelling a pairing puts the list back the way it was */
+function closeOv(){if(SIM.pending)finishWork(false);ov.hidden=true;ov.innerHTML='';if(pairing&&!PCL.includes('homepc')){PCL.unshift('homepc');renderList();selectPc('homepc')}pairing=false}
+function dialog(html,acts){ov.hidden=false;ov.innerHTML=`<div class="dlg st" data-s="relay"><div class="aurora"></div>${html}<div class="dlg-act">${acts}</div></div>`;hydrate(ov);
+  if(!RM)$('.dlg',ov).animate([{clipPath:'inset(18% 22% round 48px)',opacity:.4,transform:'scale(.94)'},{clipPath:'inset(0 round 34px)',opacity:1,transform:'none'}],{duration:380,easing:SPRING})}
+/* the demo always pairs homepc, so it leaves the list first (hidden behind the scrim) */
+function openScan(auto){
+  if(PCL.includes('homepc')){PCL=PCL.filter(x=>x!=='homepc');renderList();selectPc(PCL[0]||null)}pairing=true;
+  ov.hidden=false;ov.innerHTML=`<div class="vf"><i class="c c1"></i><i class="c c2"></i><i class="c c3"></i><i class="c c4"></i><div class="vf-qr"><div class="g21">${qrCells(5,false)}</div></div><div class="beam"></div></div><div class="ov-cap">QR okut</div>`;
+  setTimeout(()=>{const vf=$('.vf',ov);if(!vf)return;vf.classList.add('locked');setTimeout(()=>{if(pairing&&$('.vf',ov))confirmPair(auto)},RM?0:650)},RM?400:1900)}
+function confirmPair(auto){pairing=true;
+  dialog(`<div class="dlg-pc" id="dlg-pc">${ic('pc',30)}</div><h4 id="dlg-h">homepc ile eşleşilsin mi?</h4><div class="k" id="dlg-k">PC kimlik kodu · PC'dekiyle aynı olmalı</div><div class="cells" id="dlg-id">${cells('TYIM-LHQO')}</div><p id="dlg-p">Yalnız bu QR kodu kendi PC'nizde açtıysanız devam edin.</p><div class="sendst" id="dlg-st" hidden></div>`,
+    `<div class="acts" id="dlg-a1"><button class="m3btn text press" data-close>İptal</button><button class="m3btn planebtn" id="dlg-ok"><span class="pl-sheet"></span><span class="pl-lbl">Eşleştir</span><span class="pl-plane">${PLANE}</span></button></div><div class="acts" id="dlg-a2" hidden><button class="m3btn text press" id="dlg-re">Tekrar oynat</button><button class="m3btn press" id="dlg-done">Tamam</button></div>`);
+  scramble($('#dlg-id'),'TYIM-LHQO');
+  $('#dlg-ok').onclick=()=>playSend(true);$('#dlg-re').onclick=()=>confirmPair(true);$('#dlg-done').onclick=settlePair;
+  if(auto!==undefined&&auto!==false)setTimeout(()=>playSend(auto!=='fail'),RM?0:900)}
+/* send: the button folds into a plane, hovers while the TLS handshake runs, then flies to the PC (or drops) */
+async function playSend(ok){const d=$('.dlg',ov);if(!d||d.dataset.busy)return;d.dataset.busy=1;
+  const b=$('#dlg-ok'),sheet=$('.pl-sheet',b),lbl=$('.pl-lbl',b),pl=$('.pl-plane',b),st=$('#dlg-st');
+  $('[data-close]',d).style.visibility='hidden';b.classList.add('folding');fadeOut(lbl);
+  await A(sheet,[{clipPath:RECT},{clipPath:TRAP,offset:.45},{clipPath:TRI}],{duration:360,easing:'cubic-bezier(.3,.7,.3,1)'});
+  sheet.style.opacity=0;pl.style.opacity=1;A(pl,[{transform:'scale(.5) rotate(-25deg)'},{transform:'none'}],{duration:240,easing:SPRING});
+  st.className='sendst';st.textContent='Bağlanıyor… · homepc · TLS el sıkışması';fadeUp(st);d.dataset.s='connecting';
+  if(!RM)pl.classList.add('hover');
+  const res=await work(ok);pl.classList.remove('hover');
+  if(res){pl.style.opacity=0;const fx=await throwFly(d,pl,$('#dlg-pc'),`<span class="pl-plane" style="opacity:1;position:static;margin:0;display:block;width:100%;height:100%">${PLANE}</span>`,{yEase:'cubic-bezier(.1,.6,.3,1)',dur:620,rot:-12,scale:.55,trail:true});
+    A($('#dlg-pc'),[{transform:'scale(1)'},{transform:'scale(1.15)'},{transform:'none'}],{duration:320,easing:SPRING});
+    A(fx,[{opacity:1},{opacity:0}],{duration:260}).then(()=>fx.remove());st.hidden=true;
+    delete d.dataset.busy;d.dataset.s='relay';playPair();return}
+  /* failure: plane drops, the sheet unfolds red, reason stays readable, then the dialog rests */
+  await A(pl,[{transform:'none',opacity:1},{transform:'translateY(70px) rotate(75deg)',opacity:0}],{duration:420,easing:'cubic-bezier(.55,0,1,.45)'});
+  b.classList.add('fail');sheet.style.opacity=1;A(sheet,[{clipPath:TRI},{clipPath:RECT}],{duration:320,easing:SPRING});
+  lbl.textContent='Eşleşmedi';fadeUp(lbl);st.className='sendst err';st.textContent="PC'ye ulaşılamadı: bağlantı zaman aşımı";d.dataset.s='error';
+  await hold(2200);if(!d.isConnected)return;
+  b.className='m3btn planebtn';[sheet,lbl,pl].forEach(e=>{e.getAnimations().forEach(a=>a.cancel());e.style.opacity=''});lbl.textContent='Eşleştir';
+  st.hidden=true;d.dataset.s='relay';$('[data-close]',d).style.visibility='';delete d.dataset.busy}
+async function playPair(){const d=$('.dlg',ov);if(!d||d.dataset.busy)return;d.dataset.busy=1;$('#dlg-a1').style.visibility='hidden';
+  const D=d.getBoundingClientRect(),B=$('#dlg-id').getBoundingClientRect();
+  const r=await fold(d,$$('#dlg-id span:not(.dash)'),{cx:D.width/2,cy:B.top-D.top+B.height/2+10,onPhase:p=>{
+    if(p==='lift'){[$('#dlg-k'),$('#dlg-p'),$('#dlg-pc'),$('#dlg-id .dash')].forEach(fadeOut);swapText($('#dlg-h'),'Doğrulanıyor…');d.dataset.s='verify'}
+    if(p==='ok')d.dataset.s='ready';
+    if(p==='done'){swapText($('#dlg-h'),'Eşleşti');const pp=$('#dlg-p');pp.textContent='homepc · TLS 1.3 · sabitlenmiş';fadeUp(pp);$('#dlg-a1').hidden=true;fadeUp($('#dlg-a2'))}}});
+  d.__tgt=r.tgt}
+/* the single card flies from the dialog into the list and becomes the new row */
+async function settlePair(){const d=$('.dlg',ov),tgt=d&&d.__tgt;pairing=false;
+  PCL.unshift('homepc');renderList();const card=$('#pclist .pc[data-pc="homepc"]');card.style.visibility='hidden';
+  const fl=tgt?flyTo($('#pcs'),tgt,$('.av',card),tgt.innerHTML):null;closeOv();await fl;
+  card.style.visibility='';A(card,[{transform:'scale(.92)',boxShadow:'0 0 0 4px var(--ok)'},{transform:'none',boxShadow:'0 0 0 0 transparent'}],{duration:420,easing:SPRING});
+  selectPc('homepc',card)}
+$('#fab').onclick=()=>openScan(false);
+ov.addEventListener('click',e=>{if(e.target===ov||e.target.closest('[data-close]'))closeOv()});
+$('#pd').addEventListener('click',e=>{const b=e.target.closest('[data-remove]');if(b)askRemove(b.dataset.remove,false)});
+function askRemove(n,auto){
+  dialog(`<div class="morph" data-morph style="width:60px;height:60px"></div><h4>${n} kaldırılsın mı?</h4><p>Kullanmak için yeniden eşleştirmeniz gerekir.</p>`,'<div class="acts"><button class="m3btn text press" data-close>İptal</button><button class="m3btn press" id="rm-ok">Tamam</button></div>');
+  applyState($('.dlg',ov),'error',{error:{d:[]}});
+  /* chain: bin eats the button label, then the card folds away and the list closes */
+  let done=false;const go=async()=>{if(done||ov.hidden)return;done=true;closeOv();
+    await eatLabel($(`#pd [data-remove="${n}"]`));
+    const card=$(`#pclist .pc[data-pc="${n}"]`);PCL=PCL.filter(x=>x!==n);
+    if(card)await foldAway(card);if(!PCL.length)renderList();selectPc(PCL[0]||null)};
+  $('#rm-ok').onclick=go;if(auto)setTimeout(go,RM?0:900)}
+/* target app: switching on sends the app icon into the summary stack */
+const tgStack=$('#tgstack');
+function updTargets(){const n=$$('i',tgStack).length;$('#tgcount').textContent=n?`${n} uygulama`:'yok'}
+async function flyTarget(row,on){const app=row.dataset.app,col=$('.ic',row).style.background;let mi=$(`i[data-app="${app}"]`,tgStack);
+  /* the container comes to the item: icon pops up, the summary slides under it, icon drops in, container bounces and goes home */
+  if(on){if(mi)return;mi=document.createElement('i');mi.dataset.app=app;mi.style.background=col;mi.style.visibility='hidden';tgStack.append(mi);
+    if(RM){mi.style.visibility='';updTargets();return}
+    const st=$('#pcs'),kap=$('.tsum'),icEl=$('.ic',row),f=rel(icEl,st),fx=mk('fx',st),c=mk('flyic',fx,`<i style="background:${col}"></i>`);
+    Object.assign(c.style,{left:f.x+'px',top:f.y+'px',width:f.w+'px',height:f.h+'px'});
+    await A(c,[{transform:'none'},{transform:'translateY(-54px) scale(1.1) rotate(-8deg)'}],{duration:240,easing:'cubic-bezier(.2,.8,.3,1)'});
+    const K=kap.getBoundingClientRect(),Mr=mi.getBoundingClientRect(),I=icEl.getBoundingClientRect();
+    const kx=I.left+I.width/2-(Mr.left+Mr.width/2),ky=I.top+I.height/2-(Mr.top+Mr.height/2),go=`translate(${kx.toFixed(1)}px,${ky.toFixed(1)}px)`;
+    await A(kap,[{transform:'none'},{transform:go}],{duration:320,easing:SPRING});
+    await A(c,[{transform:'translateY(-54px) scale(1.1) rotate(-8deg)'},{transform:`scale(${(Mr.width/I.width).toFixed(2)})`}],{duration:280,easing:'cubic-bezier(.55,0,1,.45)'});
+    fx.remove();mi.style.visibility='';updTargets();
+    A(tgStack,[{transform:'scaleY(.82)'},{transform:'scaleY(1.06)'},{transform:'none'}],{duration:300,easing:SPRING});
+    A($('#tgcount'),[{transform:'scale(1.35)'},{transform:'none'}],{duration:300,easing:SPRING});
+    await wait(220);await A(kap,[{transform:go},{transform:'none'}],{duration:360,easing:SPRING});kap.getAnimations().forEach(a=>a.cancel())}
+  else if(mi){await A(mi,[{transform:'none',opacity:1},{transform:'scale(0) rotate(90deg)',opacity:0}],{duration:220});mi.remove();updTargets()}}
+function setApp(row,on){$('.switch',row).setAttribute('aria-pressed',on);return flyTarget(row,on)}
+
+/* wizard */
+const CHK=`<div class="ok">${ic('check',16)}</div>`;
+const W=[
+ {h:'Geliştirici seçenekleri',p:"KeyRelay klavyeyi kilitleyebilmek için Android'in kablosuz hata ayıklamasını kullanır. Bunu bir kez açman yeter; bilgisayar gerekmez.",
+  il:`<div style="display:grid;place-items:center"><div class="sunny" style="clip-path:${poly('relay')}"></div><span class="x7">×7</span></div><div class="taps">${'<i></i>'.repeat(7)}</div>`,
+  extra:`<div class="check">${CHK}<div><b>Geliştirici seçenekleri açık</b><span>Ayarlar → Telefon hakkında → Yapım numarası × 7</span></div></div>`,btn:'Devam'},
+ {h:'Eşleştirme kodu',p:'Ayarlar\'da "Kablosuz hata ayıklama → Eşleştirme koduyla eşle"ye dokun. KeyRelay portu kendisi bulur; sadece 6 haneli kodu yaz.',
+  il:'<svg class="wifi" width="150" height="150" viewBox="0 0 24 24"><path d="M1.42 9a16 16 0 0 1 21.16 0"/><path d="M5 12.55a11 11 0 0 1 14.08 0"/><path d="M8.53 16.11a6 6 0 0 1 6.95 0"/><circle cx="12" cy="20" r="1" fill="var(--a2)"/></svg>',
+  extra:'<div class="field"><label for="c1">Eşleştirme kodu</label><div class="code"><input id="c1" value="4" maxlength="1" aria-label="1. hane"><input value="6" maxlength="1" aria-label="2. hane"><input value="9" maxlength="1" aria-label="3. hane"><input maxlength="1" aria-label="4. hane"><input maxlength="1" aria-label="5. hane"><input maxlength="1" aria-label="6. hane"></div></div>',btn:'Eşleştir'},
+ {h:"PC'ni bağla",p:'Windows\'taki KeyRelay penceresinde "Eşleştir"i aç ve QR kodu okut. Bağlantı uçtan uca şifrelidir.',
+  il:`<div class="mini-vf"><i class="c" style="top:0;left:0;border-right:0;border-bottom:0;border-radius:14px 0 0 0"></i><i class="c" style="top:0;right:0;border-left:0;border-bottom:0;border-radius:0 14px 0 0"></i><i class="c" style="bottom:0;left:0;border-right:0;border-top:0;border-radius:0 0 0 14px"></i><i class="c" style="bottom:0;right:0;border-left:0;border-top:0;border-radius:0 0 14px 0"></i><div class="vf-qr" style="position:absolute;background:#fff;border-radius:6px;padding:6px"><div class="g21">${qrCells(9,false)}</div></div><div class="beam"></div></div>`,
+  extra:'',btn:'QR okut'},
+ {h:'Hazırsın',p:'Tablet açıldığında KeyRelay kendiliğinden başlar. TeamViewer önde oldukça tüm kısayolların PC\'de çalışır.',
+  il:'<div class="done-ill" style="position:relative;width:200px;height:200px;display:grid;place-items:center"><div class="orbit"><span class="kcap" style="left:0;top:40%">Alt</span><span class="kcap" style="right:0;top:20%">Tab</span><span class="kcap" style="left:38%;bottom:0">Win</span></div><svg width="120" height="120" viewBox="0 0 24 24"><circle class="cc" cx="12" cy="12" r="9"/><path class="ck" d="M8 12l3 3 5-6"/></svg></div>',
+  extra:`<div class="check">${CHK}<div><b>Açılışta otomatik başlat</b><span>Geliştirici seçenekleri ve USB hata ayıklama açık kalır; kablosuz hata ayıklama yalnız başlatırken açılır.</span></div></div>`,btn:'Bitir'}];
+let wi=1;
+const WAVE_SEG='<svg viewBox="0 0 80 10" preserveAspectRatio="none"><path d="M0 5 Q5 0 10 5 T20 5 T30 5 T40 5 T50 5 T60 5 T70 5 T80 5"/></svg>';
+function renderW(){const w=W[wi],el=$('#wiz');
+  el.innerHTML=`<div class="wiz"><div class="illus st" data-s="${wi===3?'ready':'relay'}"><div class="aurora"></div>${w.il}</div><h3>${w.h}</h3><p>${w.p}</p>${w.extra}<button class="primary press" id="wnext">${w.btn}</button>${wi>0?'<button class="ghost press" id="wback">Geri</button>':''}</div>`;
+  $$('#steps span').forEach((s,i)=>{s.className=i<wi?'done':i===wi?'cur':'';s.innerHTML=i===wi?WAVE_SEG:''});
+  $('#wnext').onclick=()=>{wi=(wi+1)%W.length;renderW()};const b=$('#wback');if(b)b.onclick=()=>{wi=Math.max(0,wi-1);renderW()};
+}
+
+/* ---------- QR (decorative 21x21; delay = distance from centre) ---------- */
+function qrCells(seed,wave){let h='';const n=21;for(let y=0;y<n;y++)for(let x=0;x<n;x++){
+  const f=(x<7&&y<7)||(x>13&&y<7)||(x<7&&y>13),edge=f&&((x%7===0||x%7===6)||(y%7===0||y%7===6)||((x%7>=2&&x%7<=4)&&(y%7>=2&&y%7<=4)));
+  const on=f?edge:((x*7+y*13+x*y+seed*(x+3*y))%5<2),dl=wave?` style="--d:${(Math.hypot(x-10,y-10)*28).toFixed(0)}ms"`:'';
+  h+=`<i${on?'':' class="o"'}${dl}></i>`}return h}
+
+/* ---------- Windows ---------- */
+const WS={relay:{st:'Yönlendiriliyor',h:'Tablet bağlı · yönlendiriliyor',s:"Galaxy Tab S9 Ultra'dan gelen tuşlar bu PC'ye yazılıyor",d:['',''],c1:'Galaxy Tab S9 Ultra',c2:'TLS 1.3 · sabitlenmiş sertifika',lead:"Servis çalışıyor · ajan oturum 1'de · kilit ekranına yazabilir"},
+ ready:{st:'Hazır',h:'Tablet bağlı · beklemede',s:'Tablette TeamViewer öne gelince tuşlar buraya akar',d:['',''],c1:'Galaxy Tab S9 Ultra',c2:'TLS 1.3 · sabitlenmiş sertifika',lead:"Servis çalışıyor · ajan oturum 1'de · kilit ekranına yazabilir"},
+ connecting:{st:'Bekliyor',h:'Tablet bekleniyor',s:'47111 ve Funnel 8443 dinleniyor · bağlı cihaz yok',d:['off','warn'],c1:'Cihaz yok',c2:'Dinleniyor',lead:"Servis çalışıyor · ajan oturum 1'de · kilit ekranına yazabilir"},
+ error:{st:'Hata',h:'Servise ulaşılamıyor',s:"KeyRelay servisi yanıt vermiyor · ayrıntı Kayıtlar'da",d:['off','err'],c1:'Cihaz yok',c2:'Servis durdu',lead:'Servise ulaşılamıyor. KeyRelay servisi çalışıyor mu?'}};
+const TT={ok:'KeyRelay · tablet bağlı',wait:'KeyRelay · tablet bekleniyor',err:'KeyRelay · servise ulaşılamıyor'};
+let ws='relay',taps=12418,qrSeed=1;
+const DEV0=[{n:'Galaxy Tab S9 Ultra',on:true,m:'bağlı · eşleşme 8 Eki · son görülme şimdi'},{n:'Pixel Tablet',on:false,m:'eşleşme 2 Eki · son görülme 3 gün önce'}];
+let DEV=DEV0.map(d=>({...d}));
+const devRow=d=>`<div class="ac devrow${d.isNew?' new':''}" data-dev="${d.n}"><span class="nd${d.on?'':' off'}">${ic('tab',22)}</span><div class="meta"><b>${d.n}${d.on?' <span class="dot live" aria-label="bağlı"></span><span class="bars" aria-hidden="true"><i></i><i></i><i></i></span>':''}${d.isNew?' <span class="nbadge">yeni</span>':''}</b><span>${d.m}</span></div>${binBtn('İptal et','wbtn',`data-revoke="${d.n}"`)}</div>`;
+const P={
+ status:()=>`<h2>Durum</h2><p class="lead" data-f="lead"></p>
+<div class="ac whero arc-host" id="whero" data-s="${ws}"><div class="hero-top"><div class="morph" data-morph style="width:50px;height:50px"></div><div><div class="state-l" data-f="st"></div><div class="headline" data-f="h"></div></div></div>
+<div class="sub" data-f="s"></div><div data-arc="760,170,tab,pc"></div>
+<div class="chips"><span class="chip"><span class="dot" data-dot="0"></span><span data-f="c1"></span></span><span class="chip"><span class="dot" data-dot="1"></span><span data-f="c2"></span></span></div></div>
+<div class="wgrid stag">
+<div class="ac wcard"><div class="khead">${kic('gauge')}<div class="k">p50 / p99 gecikme</div></div><div class="big"><span data-to="0.4" data-dec="1">0</span><small>ms</small><small>· p99 <span data-to="1.6" data-dec="1">0</span> ms</small></div><div class="k">Son 1 dakika · tuş başına gecikme</div><div data-wave="7"></div></div>
+<div class="ac wcard"><div class="khead">${kic('kbd')}<div class="k">Bugün iletilen</div></div><div class="big"><span id="wcount" data-to="${taps}">0</span><small>tuş</small></div><div class="keyrow">Son tuş <span class="kcap" id="wkey">Tab</span></div><div class="keyrow">Son tuşlar <span class="strip" id="wstrip">${stripHTML()}</span></div></div>
+<div class="ac wcard"><div class="khead">${kic('user')}<div class="k">Oturum ve ajan</div></div><div class="v">Oturum 1 · ajan çalışıyor</div><div class="keyrow"><span class="dot"></span>Giriş masaüstü Default · yazılabilir</div><div class="keyrow"><span class="dot"></span>Kilit ekranına yazabilir</div></div>
+<div class="ac wcard"><div class="khead">${kic('globe')}<div class="k">Ağ adresi</div></div><div class="v mono" style="font-size:14px">homepc.tailnet-example.ts.net:8443</div><div class="keyrow">Tailscale Funnel · yerel 192.168.1.10:47111</div></div></div>`,
+ devices:()=>`<h2>Cihazlar</h2><div style="display:flex;gap:16px;align-items:flex-start"><p class="lead" style="flex:1">Eşlenmiş tabletler. İptal edilen cihazın bağlantısı hemen kesilir ve bir daha bağlanamaz.</p><button class="wbtn accent" data-go="pair">QR ile ekle</button></div>
+<div class="stag" id="devlist">${DEV.length?DEV.map(devRow).join(''):'<p class="lead">Henüz eşlenmiş cihaz yok.</p>'}</div>`,
+ pair:()=>`<h2>Eşleştir</h2><p class="lead" id="wlead">Tablette KeyRelay → PC ekle → QR okut. Kod 5 dakika geçerli ve tek kullanımlık.</p>
+<div class="pair"><div class="qrwrap"><div class="qr" role="img" aria-label="Eşleştirme QR kodu"><div class="g21" id="qrg">${qrCells(qrSeed,true)}</div><div class="sweep"></div></div></div>
+<div class="stag"><div class="ac wcard"><div class="khead">${kic('shield')}<div class="k">PC kimliği · tablette de aynı görünmeli</div></div><div class="cells big" id="w-pcid" style="margin-top:10px">${cells('TYIM-LHQO')}</div></div>
+<div class="ac wcard cdrow" style="margin-top:10px"><svg class="ring" viewBox="0 0 64 64"><circle class="r-bg" cx="32" cy="32" r="26"/><circle class="r-fg" id="cd-ring" cx="32" cy="32" r="26"/></svg><div><div class="cdt" id="cd-txt">5:00 kaldı</div><div class="k" id="cd-exp" hidden>Kodun süresi doldu. Yeni kod alın.</div></div></div>
+<div class="ac wcard" style="margin-top:10px"><div class="khead">${kic('route')}<div class="k">QR'daki adresler</div></div><div class="v mono" style="font-size:13.5px;line-height:1.75">homepc.tailnet-example.ts.net:8443<br>100.64.0.10:47111<br>192.168.1.10:47111</div></div>
+<div class="btns"><button class="wbtn accent" id="newcode">${ic('refresh',14)} Yeni kod</button><button class="wbtn" data-go="status">Kapat</button><button class="wbtn" id="wplay">${ic('play',14)} Tablet eşleşmesini oynat</button></div></div></div>
+<div class="ac wtoast" id="wdone" hidden><span class="ck">${ic('check',18)}</span><b style="flex:1">Eşleşti. Tablet Cihazlar listesinde.</b><button class="wbtn accent" data-go="devices">Cihazlar</button><button class="wbtn" id="wreplay">Tekrar oynat</button></div>`,
+ network:()=>`<h2>Ağ</h2><p class="lead">Dışarıdan erişim için Tailscale Funnel (önerilen) ya da yerel ağ.</p>
+<div class="wgrid three stag"><div class="ac wcard">${kic('plug')}<div class="k">Port</div><div class="big">47111</div></div><div class="ac wcard">${kic('tunnel')}<div class="k">Funnel</div><div class="v">Açık · 8443 · --tcp</div></div><div class="ac wcard">${kic('fp')}<div class="k">Sertifika parmak izi</div><div class="v mono" style="font-size:13px">sha256/Xq3…9fA</div></div></div>
+<div class="ac wcard" style="margin-top:12px"><div class="khead">${kic('route')}<div class="k">Yol</div></div><svg class="topo" viewBox="0 0 700 90" aria-hidden="true"><path class="fl" d="M110 45H270"/><path class="fl" d="M430 45H590"/><rect x="20" y="20" width="90" height="50" rx="8"/><text x="65" y="44">Tablet</text><text class="s" x="65" y="60">TLS 1.3</text><rect x="270" y="20" width="160" height="50" rx="8"/><text x="350" y="44">Tailscale Funnel</text><text class="s" x="350" y="60">:8443 --tcp</text><rect x="590" y="20" width="90" height="50" rx="8"/><text x="635" y="44">Bu PC</text><text class="s" x="635" y="60">:47111</text></svg></div>
+<div class="ac wcard" style="margin-top:12px"><div class="k">Funnel adresi</div><div style="display:flex;gap:8px;margin-top:8px"><input class="tb" placeholder="makine.tailnet.ts.net:8443" value="homepc.tailnet-example.ts.net:8443" aria-label="Funnel adresi"><button class="wbtn">Kaydet</button></div>
+<div class="k" style="margin-top:12px">QR'a konacak adresler</div><div class="mono" style="font-size:13px;margin-top:4px">homepc.tailnet-example.ts.net:8443 · 100.64.0.10:47111 · 192.168.1.10:47111</div></div>
+<div class="btns"><button class="wbtn accent">Funnel'ı yeniden kur</button><button class="wbtn">Yerel ağda dinle</button></div>`,
+ logs:()=>`<h2>Kayıtlar</h2><div style="display:flex;align-items:center"><p class="lead" style="flex:1">Son 500 satır</p><button class="wbtn" data-go="logs">Yenile</button></div>
+<div class="ac log stag"><div><time>09:41:02</time><span class="tag t-ok">bağlandı</span>Galaxy Tab S9 Ultra · TLS1.3</div><div><time>09:41:02</time><span class="tag t-ac">ajan</span>oturum 1 · Default</div><div><time>09:52:18</time><span class="tag t-wa">masaüstü</span>→ Winlogon (kilit)</div><div><time>09:52:21</time><span class="tag t-vi">SAS</span>gönderildi</div><div><time>09:52:30</time><span class="tag t-wa">masaüstü</span>→ Default <span class="caret"></span></div></div>`
+};
+const wm=$('#wmain'),win=$('#win'),ind=$('#ind');let cdLeft=300,cdT=0,indY=null;
+function moveInd(k){const b=$(`.wnav button[data-p="${k}"]`),y=b.offsetTop+(b.offsetHeight-16)/2;
+  if(indY!=null&&!RM&&indY!==y)ind.animate([{transform:`translateY(${indY}px)`},{transform:`translateY(${(indY+y)/2}px) scaleY(2.4)`},{transform:`translateY(${y}px)`}],{duration:340,easing:SPRING});
+  ind.style.transform=`translateY(${y}px)`;indY=y}
+function page(k){clearInterval(cdT);$$('.fx,.wdlg',win).forEach(e=>e.remove());delete win.dataset.busy;win.dataset.s=ws;
+  if(k==='devices')$('.nbadge',$('.wnav button[data-p="devices"]'))?.remove();
+  wm.innerHTML=P[k]();hydrate(wm);
+  if(k==='status')applyState(wm,ws,WS);
+  if(k==='pair'){scramble($('#w-pcid'),'TYIM-LHQO');startCd()}
+  if(!RM)wm.animate([{opacity:0,transform:'translateY(12px)'},{opacity:1,transform:'none'}],{duration:300,easing:'cubic-bezier(.2,.8,.2,1)'});
+  $$('.wnav button').forEach(b=>b.setAttribute('aria-current',b.dataset.p===k));moveInd(k)}
+let recent=['Ctrl','Alt','Del','Alt','Tab'];
+const stripHTML=()=>recent.map(g=>`<span class="kcap">${g}</span>`).join('');
+function onWinKey(g){const c=$('#wcount'),st=$('#wstrip');taps++;if(c&&c.dataset.done)c.textContent=fmt(taps);
+  recent=[...recent.slice(-4),g];if(st)st.innerHTML=stripHTML();hitCap($('#wkey'),g)}
+function startCd(){cdLeft=300;paintCd();cdT=setInterval(()=>{cdLeft=Math.max(0,cdLeft-1);paintCd();if(!cdLeft)clearInterval(cdT)},1000)}
+function paintCd(){const r=$('#cd-ring');if(!r)return clearInterval(cdT);const C=2*Math.PI*26;
+  r.style.strokeDasharray=C.toFixed(1);r.style.strokeDashoffset=(C*(1-cdLeft/300)).toFixed(1);
+  $('#cd-txt').textContent=`${cdLeft/60|0}:${String(cdLeft%60).padStart(2,'0')} kaldı`;$('#cd-exp').hidden=cdLeft>0}
+function setTray(k){const t=k==='connecting'?'wait':k==='error'?'err':'ok';
+  $('#tray-now').innerHTML=TRAY[t];$('#fly-ic').innerHTML=TRAY[t];$('#fly-tt').textContent=TT[t];
+  $$('#legend .lg').forEach(l=>l.setAttribute('aria-current',l.dataset.t===t))}
+function setWin(k){ws=k;win.dataset.s=k;setTray(k);pressSeg($('[data-seg=windows]'),k);if($('#whero'))applyState(wm,k,WS)}
+/* QR and code fold into one device card, which then flies into the Devices menu item */
+async function playWinPair(ok=true){const code=$$('#w-pcid span:not(.dash)');if(!code.length||win.dataset.busy)return;win.dataset.busy=1;clearInterval(cdT);
+  const Wr=win.getBoundingClientRect(),M=wm.getBoundingClientRect(),cx=M.left-Wr.left+M.width/2,cy=M.top-Wr.top+M.height*.46,qr=$('.qrwrap',wm),q=rel(qr,win);
+  const qrEl=$('.qr',wm);
+  if(!ok){/* expired code: modules fade, thin red frame, ring empties, reason stays; refresh turns once and a new QR builds in */
+    $('.sweep',qrEl).hidden=true;qrEl.classList.add('expired');const r=$('#cd-ring');if(r){r.style.transition='stroke-dashoffset .5s';cdLeft=0;paintCd()}
+    const lead=$('#wlead'),old=lead.textContent;win.dataset.s='error';await swapText(lead,'Kodun süresi doldu. Yeni kod alın.');lead.classList.add('rowmsg');
+    await hold(1800);if(!lead.isConnected){delete win.dataset.busy;return}
+    await A($('#newcode svg',wm),[{transform:'none'},{transform:'rotate(360deg)'}],{duration:500,easing:'cubic-bezier(.3,.7,.3,1)'});
+    qrEl.classList.remove('expired');$('.sweep',qrEl).hidden=false;$('#qrg').innerHTML=qrCells(++qrSeed,true);if(r)r.style.transition='';
+    lead.classList.remove('rowmsg');await swapText(lead,old);win.dataset.s=ws;delete win.dataset.busy;startCd();return}
+  /* tablet read the QR: one scan pass, then the modules collapse and come out as the identity caps */
+  $('.sweep',qrEl).hidden=true;const beam=mk('qbeam',qrEl);
+  await A(beam,[{transform:'translateY(0)',opacity:1},{transform:`translateY(${qrEl.clientHeight-6}px)`,opacity:1,offset:.85},{transform:`translateY(${qrEl.clientHeight-6}px)`,opacity:0}],{duration:560,easing:'cubic-bezier(.4,0,.2,1)'});beam.remove();
+  const{fx,tgt}=await fold(win,code,{cx,cy,icon:'tab',from:qrEl,onPhase:p=>{
+    if(p==='lift'){$$('.pair .stag>*',wm).forEach(fadeOut);fadeOut($('#wplay'));
+      if(RM)qr.style.opacity=0;else A(qr,[{transform:'none',opacity:1},{transform:'rotate(45deg) scale(.08)',opacity:0}],{duration:380,easing:'cubic-bezier(.55,0,.25,1)'});
+      swapText($('#wlead'),'Tablet bağlanıyor · PC kimliği doğrulanıyor…');win.dataset.s='verify'}
+    if(p==='ok')win.dataset.s='ready';
+    if(p==='done')swapText($('#wlead'),'Eşleşti. Tablet Cihazlar listesinde.')}});
+  DEV=DEV.filter(d=>d.n!=='Galaxy Tab S9 Ultra');DEV.unshift({n:'Galaxy Tab S9 Ultra',on:true,m:'bağlı · eşleşme şimdi · son görülme şimdi',isNew:true});
+  await wait(450);
+  const nb=$('.wnav button[data-p="devices"]'),t=rel($('svg',nb),win),f=rel(tgt,win);
+  await A(tgt,[{transform:'none',opacity:1},{transform:`translate(${t.x+t.w/2-f.x-f.w/2}px,${t.y+t.h/2-f.y-f.h/2}px) scale(.22)`,opacity:.3}],{duration:560,easing:'cubic-bezier(.5,0,.2,1)'});
+  fx.remove();if(!$('.nbadge',nb))nb.insertAdjacentHTML('beforeend','<span class="nbadge">yeni</span>');
+  A(nb,[{transform:'scale(1.06)'},{transform:'none'}],{duration:320,easing:SPRING});
+  win.dataset.s=ws;fadeUp($('#wdone'));delete win.dataset.busy}
+function revoke(name,auto,ok=true){const d=document.createElement('div');d.className='wdlg';
+  d.innerHTML=`<div class="box" role="dialog" aria-label="Cihaz iptal edilsin mi?"><div class="bd"><h3>Cihaz iptal edilsin mi?</h3><div>${name} bir daha bağlanamaz. Yeniden eklemek için QR ile eşleştirin.</div></div><div class="ft"><button class="wbtn danger" data-yes>İptal et</button><button class="wbtn">Vazgeç</button></div></div>`;
+  win.append(d);let done=false;
+  const yes=async()=>{if(done||!d.isConnected)return;done=true;d.remove();const row=$(`.devrow[data-dev="${name}"]`,wm),btn=row&&$('[data-revoke]',row);
+    await eatLabel(btn,ok);
+    if(!ok){/* failure end: bin refuses, reason stays visible, then the row rests */
+      const m=row&&$('.meta>span',row),old=m&&m.textContent;if(m){m.textContent='Servise ulaşılamıyor.';m.classList.add('rowmsg')}
+      await hold(2200);if(m){m.textContent=old;m.classList.remove('rowmsg')}resetBin(btn);return}
+    DEV=DEV.filter(x=>x.n!==name);
+    if(row)await foldAway(row);if(!DEV.length&&$('#devlist'))$('#devlist').innerHTML='<p class="lead">Henüz eşlenmiş cihaz yok.</p>'};
+  d.addEventListener('click',x=>{if(x.target.closest('[data-yes]'))return yes();if(x.target===d||x.target.closest('button'))d.remove()});
+  if(auto)setTimeout(yes,RM?0:900)}
+$$('.wnav button').forEach(b=>b.addEventListener('click',()=>page(b.dataset.p)));
+wm.addEventListener('click',e=>{
+  const go=e.target.closest('[data-go]');if(go)return page(go.dataset.go);
+  if(e.target.closest('#newcode')){$('#qrg').innerHTML=qrCells(++qrSeed,true);clearInterval(cdT);startCd();return}
+  if(e.target.closest('#wplay'))return playWinPair();
+  if(e.target.closest('#wreplay')){page('pair');return setTimeout(playWinPair,RM?0:600)}
+  const rv=e.target.closest('[data-revoke]');if(rv)revoke(rv.dataset.revoke,false)});
+
+/* ---------- global wiring ---------- */
+document.addEventListener('click',e=>{
+  const t=e.target.closest('[data-theme-btn]');
+  if(t){document.documentElement.dataset.theme=t.dataset.themeBtn;$$('[data-theme-btn]').forEach(b=>b.setAttribute('aria-pressed',b.dataset.themeBtn===t.dataset.themeBtn))}
+  const sb=e.target.closest('.seg[data-seg] button');
+  if(sb){const seg=sb.parentElement,k=sb.dataset.k;if(seg.dataset.seg==='android')setAndroid(k);else setWin(k)}
+  const sw=e.target.closest('.switch');
+  if(sw){const on=sw.getAttribute('aria-pressed')!=='true';
+    if(sw.id==='a-sw')setAndroid(on?'relay':'paused');else{sw.setAttribute('aria-pressed',on);const row=sw.closest('.app[data-app]');if(row)flyTarget(row,on)}}
+  if(e.target.closest('#sc-tile'))playShortcut();
+  const sc=e.target.closest('[data-scene]');if(sc)SCENES[sc.dataset.scene]();
+  const fin=e.target.closest('[data-finish]');if(fin&&SIM.pending)finishWork(fin.dataset.finish==='ok');
+});
+/* scene buttons: each resets its precondition, then plays (replayable) */
+const SCENES={
+  'a-pair':()=>{if(!ov.hidden)closeOv();openScan(true)},
+  'a-pair-fail':()=>{if(!ov.hidden)closeOv();openScan('fail')},
+  'a-remove':()=>{if(!ov.hidden)closeOv();PCL=['homepc','devpc'];renderList();selectPc('devpc');setTimeout(()=>askRemove('devpc',true),RM?0:350)},
+  'a-target':async()=>{const row=$('.app[data-app="AnyDesk"]');await setApp(row,false);setTimeout(()=>setApp(row,true),RM?0:250)},
+  'a-short':playShortcut,
+  'a-conn':()=>playConnect(setAndroid),
+  'w-pair':()=>{page('pair');setTimeout(()=>playWinPair(true),RM?0:700)},
+  'w-pair-fail':()=>{page('pair');setTimeout(()=>playWinPair(false),RM?0:700)},
+  'w-revoke':()=>{DEV=DEV0.map(d=>({...d}));page('devices');setTimeout(()=>revoke('Pixel Tablet',true),RM?0:500)},
+  'w-revoke-fail':()=>{DEV=DEV0.map(d=>({...d}));page('devices');setTimeout(()=>revoke('Pixel Tablet',true,false),RM?0:500)},
+  'w-conn':()=>{if(!$('#whero'))page('status');playConnect(setWin)}
+};
+/* motion card: the badge changes shape only when tapped */
+const MOT=['relay','ready','connecting','error'],MOTN={relay:'Yönlendiriliyor',ready:'Hazır',connecting:'Bekliyor',error:'Hata'};let mi=0;
+$('#motmorph').addEventListener('click',()=>{mi=(mi+1)%4;const k=MOT[mi];$('#motcard').dataset.s=k;setMorph($('#motmorph'),k);$('#motname').textContent=MOTN[k]});
+$('#sendkey').addEventListener('click',()=>fire(DEMO[demoI++%DEMO.length]));
+
+hydrate(document);
+applyState(aHero,'relay',AS);
+renderW();
+renderList();selectPc('homepc');
+$('#simms').addEventListener('input',e=>$('#simout').textContent=dec(e.target.value/1000,1)+' sn');
+$$('.app[data-app]').forEach(r=>{if($('.switch',r).getAttribute('aria-pressed')==='true'){const i=document.createElement('i');i.dataset.app=r.dataset.app;i.style.background=$('.ic',r).style.background;tgStack.append(i)}});updTargets();
+page('status');setTray('relay');
+</script>
+</body>
+</html>

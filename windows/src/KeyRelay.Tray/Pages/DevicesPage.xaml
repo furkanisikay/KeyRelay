@@ -1,0 +1,23 @@
+<Page
+    x:Class="KeyRelay.Tray.Pages.DevicesPage"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
+    <Grid>
+        <StackPanel>
+            <TextBlock x:Uid="DevicesTitle" Style="{StaticResource PageTitleStyle}" />
+            <Grid ColumnSpacing="16">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition />
+                    <ColumnDefinition Width="Auto" />
+                </Grid.ColumnDefinitions>
+                <TextBlock x:Uid="DevicesLead" Style="{StaticResource LeadStyle}" />
+                <Button x:Name="AddButton" x:Uid="DevicesAdd" AutomationProperties.AutomationId="DevicesAdd" Grid.Column="1" VerticalAlignment="Top" Style="{StaticResource AccentButtonStyle}" Click="OnAdd" />
+            </Grid>
+            <InfoBar x:Name="SetAsideNotice" x:Uid="DevicesSetAside" Severity="Warning" IsClosable="True" Margin="0,0,0,12" />
+            <TextBlock x:Name="Empty" Visibility="Collapsed" Foreground="{ThemeResource MutedBrush}" />
+            <StackPanel x:Name="Rows" Spacing="8" />
+        </StackPanel>
+        <!-- One-shot effects (revoke ring) draw here, above the rows. -->
+        <Canvas x:Name="Fx" IsHitTestVisible="False" />
+    </Grid>
+</Page>
