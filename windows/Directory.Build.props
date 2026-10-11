@@ -7,5 +7,7 @@
     <AnalysisLevel>latest-recommended</AnalysisLevel>
     <EnforceCodeStyleInBuild>true</EnforceCodeStyleInBuild>
     <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
+    <!-- version.txt (repo root) is the single version source; release-please bumps it. -->
+    <Version>$([System.IO.File]::ReadAllText('$(MSBuildThisFileDirectory)..\version.txt').Trim())</Version>
   </PropertyGroup>
 </Project>

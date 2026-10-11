@@ -1,7 +1,7 @@
 name: windows
 on:
-  push: { paths: ["windows/**", "protocol/**", ".editorconfig", ".github/workflows/windows.yml"] }
-  pull_request: { paths: ["windows/**", "protocol/**", ".editorconfig", ".github/workflows/windows.yml"] }
+  push: { paths: ["windows/**", "protocol/**", "version.txt", ".editorconfig", ".github/workflows/windows.yml"] }
+  pull_request: { paths: ["windows/**", "protocol/**", "version.txt", ".editorconfig", ".github/workflows/windows.yml"] }
 jobs:
   build:
     runs-on: windows-latest

@@ -2,6 +2,10 @@ plugins {
     alias(libs.plugins.android.application)
     alias(libs.plugins.kotlin.compose)
 }
+// version.txt (repo root) is the single version source; release-please bumps it.
+val appVersion = providers.fileContents(rootProject.layout.projectDirectory.file("../version.txt")).asText.get().trim()
+val (vMajor, vMinor, vPatch) = appVersion.split(".").map(String::toInt)
+require(vMinor < 100 && vPatch < 100) { "versionCode = major*10000 + minor*100 + patch needs minor and patch < 100" }
 android {
     namespace = "dev.keyrelay"
     compileSdk = 37
@@ -10,8 +14,8 @@ android {
         applicationId = "dev.keyrelay"
         minSdk = 30
         targetSdk = 36
-        versionCode = 1
-        versionName = "0.1.0"
+        versionCode = vMajor * 10000 + vMinor * 100 + vPatch
+        versionName = appVersion
         ndk { abiFilters += listOf("arm64-v8a") }
     }
     buildFeatures { compose = true; aidl = true }

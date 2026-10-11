@@ -1,19 +1,28 @@
 name: release
 on:
-  push: { tags: ["v*"] }
-permissions: { contents: write }
+  push: { branches: [main] }
+permissions: { contents: write, issues: write, pull-requests: write }
 jobs:
-  release:
+  release-please:
+    runs-on: ubuntu-latest
+    outputs:
+      release_created: ${{ steps.release.outputs.release_created }}
+      tag_name: ${{ steps.release.outputs.tag_name }}
+      version: ${{ steps.release.outputs.version }}
+    steps:
+      - id: release
+        uses: googleapis/release-please-action@v5
+  # Same workflow on purpose: a tag created with GITHUB_TOKEN does not trigger other workflows (docs.github.com "Triggering a workflow from a workflow").
+  publish:
+    needs: release-please
+    if: ${{ needs.release-please.outputs.release_created == 'true' }}
     runs-on: windows-latest
+    env:
+      TAG: ${{ needs.release-please.outputs.tag_name }}
+      VERSION: ${{ needs.release-please.outputs.version }}
     steps:
       - uses: actions/checkout@v7
-      - name: Check the tag matches the app versions
-        shell: pwsh
-        run: |
-          $v = '${{ github.ref_name }}'.TrimStart('v')
-          if (-not (Select-String -Path installer/KeyRelay.iss -Pattern "#define AppVersion `"$v`"" -Quiet)) { throw "installer/KeyRelay.iss is not $v" }
-          if (-not (Select-String -Path android/app/build.gradle.kts -Pattern "versionName = `"$v`"" -Quiet)) { throw "android versionName is not $v" }
-          "VERSION=$v" >> $env:GITHUB_ENV
+        with: { ref: "${{ needs.release-please.outputs.tag_name }}" }
       - uses: actions/setup-dotnet@v6
         with: { global-json-file: windows/global.json }
       - uses: actions/setup-java@v6
@@ -24,9 +33,9 @@ jobs:
       - run: ./installer/build.ps1
         shell: pwsh
       - run: ./android/gradlew.bat -p android test assembleDebug
-      - name: Publish the release
+      - name: Upload the release assets
         shell: pwsh
         env: { GH_TOKEN: "${{ github.token }}" }
         run: |
           Copy-Item android/app/build/outputs/apk/debug/app-debug.apk "KeyRelay-$env:VERSION.apk"
-          gh release create '${{ github.ref_name }}' "artifacts/installer/KeyRelay-Setup-$env:VERSION.exe" "KeyRelay-$env:VERSION.apk" --title "KeyRelay $env:VERSION" --notes-file CHANGELOG.md
+          gh release upload $env:TAG "artifacts/installer/KeyRelay-Setup-$env:VERSION.exe" "artifacts/installer/KeyRelay-$env:VERSION.zip" "KeyRelay-$env:VERSION.apk"

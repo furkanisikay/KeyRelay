@@ -1,4 +1,7 @@
-#define AppVersion "0.1.0"
+; build.ps1 passes /DAppVersion; a direct ISCC/IDE compile falls back to version.txt.
+#ifndef AppVersion
+  #define AppVersion Trim(FileRead(FileOpen(AddBackslash(SourcePath) + "..\version.txt")))
+#endif
 
 [Setup]
 AppId={{5B7C9E2A-3F41-4D8B-9C6E-1A2B3C4D5E6F}

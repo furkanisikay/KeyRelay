@@ -6,4 +6,4 @@
 
 <!-- Tablet modeli / Android sürümü, klavye, Windows sürümü -->
 
-- [ ] `CHANGELOG.md` güncellendi
+- [ ] Commit başlıkları `type(scope): açıklama` biçiminde (`CHANGELOG.md` bunlardan otomatik üretilir, elle düzenleme)

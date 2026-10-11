@@ -3,6 +3,7 @@ $ErrorActionPreference = 'Stop'
 $root = Split-Path $PSScriptRoot -Parent
 $layout = Join-Path $root 'artifacts\layout'
 $output = Join-Path $root 'artifacts\installer'
+$version = (Get-Content (Join-Path $root 'version.txt') -Raw).Trim()
 Remove-Item -Recurse -Force $layout -ErrorAction SilentlyContinue
 # global.json lives in windows\; dotnet picks the SDK from the current directory.
 Push-Location (Join-Path $root 'windows')
@@ -19,7 +20,7 @@ if (-not $smoke.WaitForExit(60000)) { $smoke.Kill(); throw 'tray smoke timed out
 if ($smoke.ExitCode -ne 0) { throw "tray smoke failed ($($smoke.ExitCode))" }
 $iscc = @("${env:ProgramFiles(x86)}\Inno Setup 6\ISCC.exe", "$env:LOCALAPPDATA\Programs\Inno Setup 6\ISCC.exe") | Where-Object { Test-Path $_ } | Select-Object -First 1
 if (-not $iscc) { throw 'Inno Setup 6 not found (winget install --id JRSoftware.InnoSetup -e)' }
-& $iscc (Join-Path $PSScriptRoot 'KeyRelay.iss')
+& $iscc "/DAppVersion=$version" (Join-Path $PSScriptRoot 'KeyRelay.iss')
 if ($LASTEXITCODE -ne 0) { throw 'ISCC failed' }
-Compress-Archive -Path (Join-Path $layout '*') -DestinationPath (Join-Path $output 'KeyRelay-0.1.0.zip') -Force
+Compress-Archive -Path (Join-Path $layout '*') -DestinationPath (Join-Path $output "KeyRelay-$version.zip") -Force
 Get-ChildItem $output | Select-Object Name, @{ n = 'MB'; e = { [math]::Round($_.Length / 1MB, 1) } }
