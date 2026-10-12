@@ -1,0 +1,125 @@
+<Page
+    x:Class="KeyRelay.Tray.Pages.NetworkPage"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:local="using:KeyRelay.Tray">
+    <Page.Resources>
+        <Style x:Key="NodeStyle" TargetType="Rectangle">
+            <Setter Property="Height" Value="50" />
+            <Setter Property="RadiusX" Value="8" />
+            <Setter Property="RadiusY" Value="8" />
+            <Setter Property="Fill" Value="{ThemeResource NodeBrush}" />
+            <Setter Property="Stroke" Value="{ThemeResource LineBrush}" />
+        </Style>
+        <Style x:Key="NodeTitleStyle" TargetType="TextBlock">
+            <Setter Property="FontSize" Value="12" />
+            <Setter Property="FontWeight" Value="SemiBold" />
+            <Setter Property="TextAlignment" Value="Center" />
+        </Style>
+        <Style x:Key="NodeSubStyle" TargetType="TextBlock">
+            <Setter Property="FontFamily" Value="{StaticResource NumberFont}" />
+            <Setter Property="FontSize" Value="10.5" />
+            <Setter Property="Foreground" Value="{ThemeResource MutedBrush}" />
+            <Setter Property="TextAlignment" Value="Center" />
+        </Style>
+        <Style x:Key="FlowStyle" TargetType="Line">
+            <Setter Property="Stroke" Value="#22D3EE" />
+            <Setter Property="StrokeThickness" Value="2.5" />
+            <Setter Property="StrokeDashArray" Value="0.8,3.6" />
+            <Setter Property="StrokeDashCap" Value="Round" />
+        </Style>
+    </Page.Resources>
+    <StackPanel>
+        <TextBlock x:Uid="NetworkTitle" Style="{StaticResource PageTitleStyle}" />
+        <TextBlock x:Uid="NetworkLead" Style="{StaticResource LeadStyle}" />
+        <Grid ColumnSpacing="12">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition />
+                <ColumnDefinition />
+                <ColumnDefinition />
+            </Grid.ColumnDefinitions>
+            <Border Style="{StaticResource CardStyle}">
+                <StackPanel>
+                    <Border Style="{StaticResource KeyTileStyle}" HorizontalAlignment="Left" Margin="0,0,0,8"><FontIcon Style="{StaticResource KeyGlyphStyle}" Glyph="{StaticResource GlyphPort}" /></Border>
+                    <StackPanel Orientation="Horizontal" Spacing="4">
+                        <TextBlock x:Uid="NetworkPortLabel" Style="{StaticResource CardKeyStyle}" VerticalAlignment="Center" />
+                        <local:InfoTip TextKey="InfoPort" />
+                    </StackPanel>
+                    <TextBlock x:Name="PortValue" Style="{StaticResource BigNumberStyle}" />
+                </StackPanel>
+            </Border>
+            <Border Grid.Column="1" Style="{StaticResource CardStyle}">
+                <StackPanel>
+                    <Border Style="{StaticResource KeyTileStyle}" HorizontalAlignment="Left" Margin="0,0,0,8"><FontIcon Style="{StaticResource KeyGlyphStyle}" Glyph="{StaticResource GlyphGlobe}" /></Border>
+                    <StackPanel Orientation="Horizontal" Spacing="4">
+                        <TextBlock x:Uid="NetworkFunnelStateLabel" Style="{StaticResource CardKeyStyle}" VerticalAlignment="Center" TextWrapping="Wrap" MaxWidth="180" />
+                        <local:InfoTip TextKey="InfoFunnel" />
+                    </StackPanel>
+                    <TextBlock x:Name="FunnelValue" Style="{StaticResource CardValueStyle}" />
+                </StackPanel>
+            </Border>
+            <Border Grid.Column="2" Style="{StaticResource CardStyle}">
+                <StackPanel>
+                    <Border Style="{StaticResource KeyTileStyle}" HorizontalAlignment="Left" Margin="0,0,0,8"><FontIcon Style="{StaticResource KeyGlyphStyle}" Glyph="{StaticResource GlyphFingerprint}" /></Border>
+                    <StackPanel Orientation="Horizontal" Spacing="4">
+                        <TextBlock x:Name="FingerprintLabel" x:Uid="NetworkFingerprintLabel" Style="{StaticResource CardKeyStyle}" VerticalAlignment="Center" />
+                        <local:InfoTip TextKey="InfoFingerprint" />
+                    </StackPanel>
+                    <TextBlock x:Name="FingerprintValue" FontFamily="{StaticResource NumberFont}" FontSize="13" Margin="0,8,0,0" IsTextSelectionEnabled="True" AutomationProperties.LabeledBy="{x:Bind FingerprintLabel}" />
+                </StackPanel>
+            </Border>
+        </Grid>
+        <!-- Static path diagram: tablet, the way in, this PC. -->
+        <Border Style="{StaticResource CardStyle}" Margin="0,12,0,0">
+            <StackPanel>
+                <StackPanel Orientation="Horizontal" Spacing="4">
+                    <TextBlock x:Uid="NetworkRouteLabel" Style="{StaticResource CardKeyStyle}" VerticalAlignment="Center" />
+                    <local:InfoTip TextKey="InfoRoute" />
+                </StackPanel>
+                <Viewbox MaxHeight="90" Margin="0,10,0,0" AutomationProperties.AccessibilityView="Raw">
+                    <Canvas Width="700" Height="90">
+                        <Line X1="110" Y1="45" X2="270" Y2="45" Style="{StaticResource FlowStyle}" />
+                        <Line X1="430" Y1="45" X2="590" Y2="45" Style="{StaticResource FlowStyle}" />
+                        <Rectangle Canvas.Left="20" Canvas.Top="20" Width="90" Style="{StaticResource NodeStyle}" />
+                        <Rectangle Canvas.Left="270" Canvas.Top="20" Width="160" Style="{StaticResource NodeStyle}" />
+                        <Rectangle Canvas.Left="590" Canvas.Top="20" Width="90" Style="{StaticResource NodeStyle}" />
+                        <StackPanel Canvas.Left="20" Canvas.Top="27" Width="90">
+                            <TextBlock x:Uid="RouteTablet" Style="{StaticResource NodeTitleStyle}" />
+                            <TextBlock x:Uid="RouteTabletSub" Style="{StaticResource NodeSubStyle}" />
+                        </StackPanel>
+                        <StackPanel Canvas.Left="270" Canvas.Top="27" Width="160">
+                            <TextBlock x:Name="RouteMiddle" Style="{StaticResource NodeTitleStyle}" />
+                            <TextBlock x:Name="RouteMiddleSub" Style="{StaticResource NodeSubStyle}" />
+                        </StackPanel>
+                        <StackPanel Canvas.Left="590" Canvas.Top="27" Width="90">
+                            <TextBlock x:Uid="RoutePc" Style="{StaticResource NodeTitleStyle}" />
+                            <TextBlock x:Name="RoutePcSub" Style="{StaticResource NodeSubStyle}" />
+                        </StackPanel>
+                    </Canvas>
+                </Viewbox>
+            </StackPanel>
+        </Border>
+        <Border Style="{StaticResource CardStyle}" Margin="0,12,0,0">
+            <StackPanel Spacing="8">
+                <StackPanel Orientation="Horizontal" Spacing="4">
+                    <TextBlock x:Name="FunnelLabel" x:Uid="NetworkFunnelLabel" Style="{StaticResource CardKeyStyle}" VerticalAlignment="Center" />
+                    <local:InfoTip TextKey="InfoFunnelAddress" />
+                </StackPanel>
+                <Grid ColumnSpacing="8">
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition />
+                        <ColumnDefinition Width="Auto" />
+                    </Grid.ColumnDefinitions>
+                    <TextBox x:Name="FunnelBox" x:Uid="NetworkFunnelBox" AutomationProperties.AutomationId="FunnelBox" FontFamily="{StaticResource NumberFont}" AutomationProperties.LabeledBy="{x:Bind FunnelLabel}" />
+                    <Button x:Uid="NetworkFunnelSave" AutomationProperties.AutomationId="FunnelSave" Grid.Column="1" Style="{StaticResource AccentButtonStyle}" Click="OnSaveFunnel" />
+                </Grid>
+                <StackPanel Orientation="Horizontal" Spacing="4" Margin="0,4,0,0">
+                    <TextBlock x:Uid="NetworkAddressesLabel" Style="{StaticResource CardKeyStyle}" VerticalAlignment="Center" />
+                    <local:InfoTip TextKey="InfoQrAddresses" />
+                </StackPanel>
+                <TextBlock x:Name="AddressesValue" FontFamily="{StaticResource NumberFont}" FontSize="13" TextWrapping="Wrap" IsTextSelectionEnabled="True" />
+            </StackPanel>
+        </Border>
+        <InfoBar x:Name="Result" IsClosable="True" Margin="0,12,0,0" />
+    </StackPanel>
+</Page>

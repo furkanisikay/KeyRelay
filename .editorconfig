@@ -1,0 +1,41 @@
+root = true
+
+[*]
+charset = utf-8
+end_of_line = lf
+insert_final_newline = true
+trim_trailing_whitespace = true
+indent_style = space
+indent_size = 4
+
+[*.{yml,yaml,json,md}]
+indent_size = 2
+
+[*.{kt,kts}]
+max_line_length = 120
+ktlint_code_style = android_studio
+
+[*.cs]
+max_line_length = 120
+dotnet_naming_rule.constants.symbols = constants
+dotnet_naming_rule.constants.style = upper_snake
+dotnet_naming_rule.constants.severity = warning
+dotnet_naming_symbols.constants.applicable_kinds = field
+dotnet_naming_symbols.constants.required_modifiers = const
+dotnet_naming_style.upper_snake.capitalization = all_upper
+dotnet_naming_style.upper_snake.word_separator = _
+dotnet_naming_rule.private_fields.symbols = private_fields
+dotnet_naming_rule.private_fields.style = underscore_camel
+dotnet_naming_rule.private_fields.severity = warning
+dotnet_naming_symbols.private_fields.applicable_kinds = field
+dotnet_naming_symbols.private_fields.applicable_accessibilities = private
+dotnet_naming_style.underscore_camel.capitalization = camel_case
+dotnet_naming_style.underscore_camel.required_prefix = _
+
+# Constants are UPPER_SNAKE by the naming rule above; test names follow Method_Scenario_ExpectedResult
+[windows/**.cs]
+dotnet_diagnostic.CA1707.severity = none
+
+[windows/tests/**.cs]
+# Expected values read best inline in assertions; allocation cost does not matter in tests
+dotnet_diagnostic.CA1861.severity = none

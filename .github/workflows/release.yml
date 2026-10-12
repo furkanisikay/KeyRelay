@@ -1,0 +1,48 @@
+name: release
+on:
+  push: { branches: [main] }
+  # Rebuilds and re-uploads the assets of an existing release, e.g. after a failed publish.
+  workflow_dispatch:
+    inputs:
+      tag: { description: "Existing release tag, e.g. v0.2.0", required: true }
+permissions: { contents: write, issues: write, pull-requests: write }
+jobs:
+  release-please:
+    if: ${{ github.event_name == 'push' }}
+    runs-on: ubuntu-latest
+    outputs:
+      release_created: ${{ steps.release.outputs.release_created }}
+      tag_name: ${{ steps.release.outputs.tag_name }}
+    steps:
+      - id: release
+        uses: googleapis/release-please-action@v5
+  # Same workflow on purpose: a tag created with GITHUB_TOKEN does not trigger other workflows (docs.github.com "Triggering a workflow from a workflow").
+  publish:
+    needs: release-please
+    if: ${{ always() && (needs.release-please.outputs.release_created == 'true' || github.event_name == 'workflow_dispatch') }}
+    runs-on: windows-latest
+    env:
+      TAG: ${{ inputs.tag || needs.release-please.outputs.tag_name }}
+    steps:
+      - uses: actions/checkout@v7
+        with: { ref: "${{ inputs.tag || needs.release-please.outputs.tag_name }}" }
+      - run: '"VERSION=$((Get-Content version.txt).Trim())" >> $env:GITHUB_ENV'
+        shell: pwsh
+      - uses: actions/setup-dotnet@v6
+        with: { global-json-file: windows/global.json }
+      - uses: actions/setup-java@v6
+        with: { distribution: temurin, java-version: "21" }
+      - uses: gradle/actions/setup-gradle@v6
+      - run: choco install innosetup -y --no-progress
+      # global.json (test runner mode) is only picked up from the windows directory.
+      - run: dotnet test KeyRelay.slnx -c Release
+        working-directory: windows
+      - run: ./installer/build.ps1
+        shell: pwsh
+      - run: ./android/gradlew.bat -p android test assembleDebug
+      - name: Upload the release assets
+        shell: pwsh
+        env: { GH_TOKEN: "${{ github.token }}" }
+        run: |
+          Copy-Item android/app/build/outputs/apk/debug/app-debug.apk "KeyRelay-$env:VERSION.apk"
+          gh release upload $env:TAG "artifacts/installer/KeyRelay-Setup-$env:VERSION.exe" "artifacts/installer/KeyRelay-$env:VERSION.zip" "KeyRelay-$env:VERSION.apk" --clobber

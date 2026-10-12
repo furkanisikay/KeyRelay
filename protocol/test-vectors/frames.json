@@ -1,0 +1,33 @@
+{
+  "version": 1,
+  "valid": [
+    { "name": "key_down_a", "channels": ["tls", "pipe"], "type": "KEY", "fields": { "code": 30, "value": 1 }, "hex": "000410001e01" },
+    { "name": "key_up_leftmeta", "channels": ["tls", "pipe"], "type": "KEY", "fields": { "code": 125, "value": 0 }, "hex": "000410007d00" },
+    { "name": "key_repeat_tab", "channels": ["tls", "pipe"], "type": "KEY", "fields": { "code": 15, "value": 2 }, "hex": "000410000f02" },
+    { "name": "hello", "channels": ["tls"], "type": "HELLO", "fields": { "version": 1, "deviceId": "000102030405060708090a0b0c0d0e0f", "token": "202122232425262728292a2b2c2d2e2f303132333435363738393a3b3c3d3e3f" }, "hex": "00320301000102030405060708090a0b0c0d0e0f202122232425262728292a2b2c2d2e2f303132333435363738393a3b3c3d3e3f" },
+    { "name": "pair", "channels": ["tls"], "type": "PAIR", "fields": { "version": 1, "code": "a0a1a2a3a4a5a6a7a8a9aaabacadaeaf", "deviceName": "Tab" }, "hex": "00150101a0a1a2a3a4a5a6a7a8a9aaabacadaeaf546162" },
+    { "name": "paired", "channels": ["tls"], "type": "PAIRED", "fields": { "deviceId": "000102030405060708090a0b0c0d0e0f", "token": "202122232425262728292a2b2c2d2e2f303132333435363738393a3b3c3d3e3f" }, "hex": "003102000102030405060708090a0b0c0d0e0f202122232425262728292a2b2c2d2e2f303132333435363738393a3b3c3d3e3f" },
+    { "name": "welcome", "channels": ["tls"], "type": "WELCOME", "fields": { "pcName": "PC" }, "hex": "0003045043" },
+    { "name": "welcome_max_length", "channels": ["tls"], "type": "WELCOME", "fields": { "pcName": "AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA" }, "hex": "02000441414141414141414141414141414141414141414141414141414141414141414141414141414141414141414141414141414141414141414141414141414141414141414141414141414141414141414141414141414141414141414141414141414141414141414141414141414141414141414141414141414141414141414141414141414141414141414141414141414141414141414141414141414141414141414141414141414141414141414141414141414141414141414141414141414141414141414141414141414141414141414141414141414141414141414141414141414141414141414141414141414141414141414141414141414141414141414141414141414141414141414141414141414141414141414141414141414141414141414141414141414141414141414141414141414141414141414141414141414141414141414141414141414141414141414141414141414141414141414141414141414141414141414141414141414141414141414141414141414141414141414141414141414141414141414141414141414141414141414141414141414141414141414141414141414141414141414141414141414141414141414141414141414141414141414141414141414141414141414141414141414141414141414141414141414141414141414141414141414141414141" },
+    { "name": "reject_unknown_device", "channels": ["tls"], "type": "REJECT", "fields": { "reason": 2 }, "hex": "00020502" },
+    { "name": "state_ready", "channels": ["tls"], "type": "STATE", "fields": { "ready": true }, "hex": "00021101" },
+    { "name": "state_not_ready", "channels": ["tls"], "type": "STATE", "fields": { "ready": false }, "hex": "00021100" },
+    { "name": "sas", "channels": ["tls"], "type": "SAS", "fields": {}, "hex": "000112" },
+    { "name": "lock", "channels": ["tls", "pipe"], "type": "LOCK", "fields": {}, "hex": "000113" },
+    { "name": "ping", "channels": ["tls"], "type": "PING", "fields": { "seq": 16909060 }, "hex": "00052001020304" },
+    { "name": "pong", "channels": ["tls"], "type": "PONG", "fields": { "seq": 16909060 }, "hex": "00052101020304" },
+    { "name": "release_all", "channels": ["pipe"], "type": "RELEASE_ALL", "fields": {}, "hex": "000130" },
+    { "name": "desktop_writable", "channels": ["pipe"], "type": "DESKTOP", "fields": { "writable": true, "name": "Default" }, "hex": "0009310144656661756c74" },
+    { "name": "desktop_not_writable", "channels": ["pipe"], "type": "DESKTOP", "fields": { "writable": false, "name": "Winlogon" }, "hex": "000a310057696e6c6f676f6e" },
+    { "name": "key_done", "channels": ["pipe"], "type": "KEY_DONE", "fields": { "read": 1000000, "attached": 1000500, "done": 1001000 }, "hex": "00193200000000000f424000000000000f443400000000000f4628" },
+    { "name": "agent_log_warning", "channels": ["pipe"], "type": "AGENT_LOG", "fields": { "warning": true, "text": "media=VolumeUp path=coreaudio hr=0x80070005" }, "hex": "002d33016d656469613d566f6c756d65557020706174683d636f7265617564696f2068723d30783830303730303035" }
+  ],
+  "invalid": [
+    { "name": "empty_length", "hex": "0000", "error": "empty" },
+    { "name": "length_over_512", "hex": "0201", "error": "too_large" },
+    { "name": "unknown_type", "hex": "00017f", "error": "unknown_type" },
+    { "name": "key_payload_short", "hex": "000310001e", "error": "bad_payload" },
+    { "name": "key_value_out_of_range", "hex": "000410001e03", "error": "bad_payload" },
+    { "name": "hello_truncated_token", "hex": "00320301000102", "error": "truncated" }
+  ]
+}
