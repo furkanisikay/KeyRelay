@@ -1,5 +1,12 @@
 # Changelog
 
+## [0.2.0](https://github.com/furkanisikay/KeyRelay/compare/v0.1.0...v0.2.0) (2026-10-12)
+
+
+### Features
+
+* fare tuşları pc'ye gider, kaydırma yönü ayarlanabilir ([ea1ebdf](https://github.com/furkanisikay/KeyRelay/commit/ea1ebdfab35fc8ebe638a6cc13f3496a2846c640))
+
 ## [0.1.0] - 2026-10-12
 
 First public version.
