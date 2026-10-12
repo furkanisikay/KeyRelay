@@ -25,7 +25,7 @@ class AppSettingsTest {
         val original = AppSettings(
             pcs = listOf(pc()), targets = setOf("a.b"), enabled = false, pingIntervalMs = 2_000, pongTimeoutMs = 5_000,
             sendTimeoutMs = 500, toggleKey = RelayStateMachine.KEY_INSERT, onboardingDone = true, showKeys = true,
-            introSeen = true,
+            introSeen = true, invertHorizontalScroll = true, invertVerticalScroll = true,
         )
         val prefs = mutablePreferencesOf()
         original.writeTo(prefs)

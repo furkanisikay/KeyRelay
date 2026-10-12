@@ -17,4 +17,8 @@ object Evdev {
     @JvmStatic external fun phys(fd: Int): String?
     @JvmStatic external fun uniq(fd: Int): String?
     @JvmStatic external fun read(fd: Int, buffer: ByteBuffer): Int
+
+    /** A uinput device with the key, rel and msc bits of [source]; returns its fd. Closing the fd destroys it. */
+    @JvmStatic external fun createMouse(source: Int, name: String): Int
+    @JvmStatic external fun emit(fd: Int, type: Int, code: Int, value: Int): Int
 }

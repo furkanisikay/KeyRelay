@@ -65,6 +65,8 @@ class RelayStateMachine(private val out: Output) {
             swallowed[code] -> if (value == 0) swallowed[code] = false
             value == 1 && code == toggleKey && ctrl() && alt() -> { swallowed[code] = true; toggle() }
             !grabbed -> Unit
+            // Left and right only hold the grab; the helper writes them to its virtual mouse.
+            MouseRouting.isButton(code) && !MouseRouting.toPc(code) -> Unit
             value == 1 && code == KEY_DELETE && ctrl() && alt() -> { swallowed[code] = true; out.sendSas() }
             value == 1 && code == KEY_L && meta() -> { swallowed[code] = true; out.sendLock() }
             else -> out.sendKey(code, value)
@@ -72,9 +74,12 @@ class RelayStateMachine(private val out: Output) {
         applyGrab()
     }
 
-    /** The keyboard node vanished (Bluetooth out of range): its key-ups may never arrive, so release what is held. */
-    fun releaseHeld() {
-        for (code in held.indices) if (held[code]) onKey(code, 0)
+    /**
+     * A node vanished (Bluetooth out of range): its key-ups may never arrive, so release what it held. [mouse]: a mouse
+     * node releases only mouse buttons, a keyboard node only keys.
+     */
+    fun releaseHeld(mouse: Boolean) {
+        for (code in held.indices) if (held[code] && MouseRouting.isButton(code) == mouse) onKey(code, 0)
     }
 
     private fun toggle() {

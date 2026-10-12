@@ -100,7 +100,7 @@ class RelayStateMachineTest {
         ready(true); fresh()
         keys(29 to 1, 30 to 1)
         m.onForeground(targetForeground = false, targetEvent = true)
-        m.releaseHeld()
+        m.releaseHeld(mouse = false)
         assertEquals(listOf("key 29 1", "key 30 1", "key 29 0", "key 30 0", "grab false"), out.log)
     }
 
@@ -222,12 +222,86 @@ class RelayStateMachineTest {
         ready(true)
         keys(29 to 1, 56 to 1, 57 to 1)
         fresh()
-        m.releaseHeld()
+        m.releaseHeld(mouse = false)
         assertFalse(out.log.contains("key 57 0"))
         m.setEnabled(true)
         fresh()
         keys(57 to 1, 57 to 0)
         assertEquals(listOf("key 57 1", "key 57 0"), out.log)
+    }
+
+    @Test
+    fun onForeground_targetLeavesWhileMouseSideHeld_releaseGoesToPcThenUngrab() {
+        ready(true); fresh()
+        m.onKey(0x113, 1)
+        m.onForeground(false, targetEvent = true)
+        m.onKey(0x113, 0)
+        assertEquals(listOf("key 275 1", "key 275 0", "grab false"), out.log)
+    }
+
+    @Test
+    fun onForeground_targetArrivesWhileMouseMiddleHeld_grabsAfterRelease() {
+        m.setConnected(true)
+        m.setPcReady(true)
+        m.onKey(0x112, 1)
+        m.onForeground(true, targetEvent = true)
+        assertEquals(emptyList<String>(), out.log)
+        m.onKey(0x112, 0)
+        assertEquals(listOf("grab true"), out.log)
+    }
+
+    @Test
+    fun releaseHeld_mouseButtonHeldWhenNodeLost_sendsReleaseAndUngrabs() {
+        ready(true)
+        m.onKey(0x115, 1)
+        m.setPcReady(false)
+        fresh()
+        m.releaseHeld(mouse = true)
+        assertEquals(listOf("key 277 0", "grab false"), out.log)
+    }
+
+    @Test
+    fun onForeground_targetArrivesWhileMouseLeftHeld_grabsAfterRelease() {
+        m.setConnected(true)
+        m.setPcReady(true)
+        m.onKey(0x110, 1)
+        m.onForeground(true, targetEvent = true)
+        assertEquals(emptyList<String>(), out.log)
+        m.onKey(0x110, 0)
+        assertEquals(listOf("grab true"), out.log)
+    }
+
+    @Test
+    fun onKey_leftRightWhileGrabbed_neverSentToPcButHoldTheGrab() {
+        ready(true); fresh()
+        m.onKey(0x111, 1)
+        m.onForeground(false, targetEvent = true)
+        assertEquals(emptyList<String>(), out.log)
+        m.onKey(0x111, 0)
+        assertEquals(listOf("grab false"), out.log)
+    }
+
+    @Test
+    fun releaseHeld_mouseNodeLost_keepsKeyboardKeysHeld() {
+        ready(true)
+        keys(42 to 1, 0x110 to 1, 0x113 to 1)
+        fresh()
+        m.releaseHeld(mouse = true)
+        assertEquals(listOf("key 275 0"), out.log)
+        m.onKey(30, 1)
+        assertEquals(listOf("key 275 0", "key 30 1"), out.log)
+    }
+
+    @Test
+    fun releaseHeld_keyboardNodeLost_keepsMouseButtonsHeld() {
+        ready(true)
+        keys(42 to 1, 0x112 to 1)
+        fresh()
+        m.releaseHeld(mouse = false)
+        m.onForeground(false, targetEvent = true)
+        assertEquals(listOf("key 42 0"), out.log)
+        m.onKey(0x112, 0)
+        assertEquals(listOf("key 42 0", "key 274 0", "grab false"), out.log)
     }
 
     @Test

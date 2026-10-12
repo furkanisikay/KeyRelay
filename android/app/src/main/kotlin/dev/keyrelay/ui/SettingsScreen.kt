@@ -91,6 +91,15 @@ fun SettingsScreen(settings: AppSettings, onRunWizard: () -> Unit, onBack: () ->
             SwitchCard(stringResource(R.string.show_keys), stringResource(R.string.settings_show_keys_hint), settings.showKeys, stringResource(R.string.info_show_keys)) { on ->
                 save { it.copy(showKeys = on) }
             }
+            SectionTitle(stringResource(R.string.settings_mouse), stringResource(R.string.info_invert_scroll))
+            SwitchCard(stringResource(R.string.invert_vertical_scroll), stringResource(R.string.invert_vertical_scroll_hint), settings.invertVerticalScroll) { on ->
+                save { it.copy(invertVerticalScroll = on) }
+            }
+            Box(Modifier.padding(top = 8.dp)) {
+                SwitchCard(stringResource(R.string.invert_horizontal_scroll), stringResource(R.string.invert_horizontal_scroll_hint), settings.invertHorizontalScroll) { on ->
+                    save { it.copy(invertHorizontalScroll = on) }
+                }
+            }
             SectionTitle(stringResource(R.string.settings_connection), stringResource(R.string.info_check))
             KrCard(Modifier.fillMaxWidth().padding(top = 8.dp)) {
                 // A reply wait not longer than the ping interval would drop healthy connections; such pairs are disabled.

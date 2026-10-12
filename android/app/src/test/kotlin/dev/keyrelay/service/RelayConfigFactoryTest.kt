@@ -44,6 +44,14 @@ class RelayConfigFactoryTest {
     }
 
     @Test
+    fun build_invertScroll_eachDirectionFollowsItsOwnSetting() {
+        val off = RelayConfigFactory.build(AppSettings(), uids::get) { it }
+        val horizontal = RelayConfigFactory.build(AppSettings(invertHorizontalScroll = true), uids::get) { it }
+        assertEquals(listOf(false, false), listOf(off.invertHorizontalScroll, off.invertVerticalScroll))
+        assertEquals(listOf(true, false), listOf(horizontal.invertHorizontalScroll, horizontal.invertVerticalScroll))
+    }
+
+    @Test
     fun build_noPc_noEndpointsButSettingsPassed() {
         val c = RelayConfigFactory.build(AppSettings(enabled = false, pingIntervalMs = 2_000, pongTimeoutMs = 5_000), uids::get) { it }
         assertEquals(0, c.endpoints.size)

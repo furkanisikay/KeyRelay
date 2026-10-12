@@ -159,6 +159,12 @@
     <string name="settings_shortcut_hint">Ctrl Alt and this key turn sending keys to the PC on and off. While it is off, Ctrl Alt Space also switches the Samsung keyboard language.</string>
     <string name="settings_privacy">Privacy</string>
     <string name="settings_show_keys_hint">Same as the eye on the status screen. When off, which key you pressed never reaches the app screen.</string>
+    <string name="settings_mouse">Mouse</string>
+    <string name="invert_vertical_scroll">Invert vertical scrolling</string>
+    <string name="invert_vertical_scroll_hint">The wheel scrolls the other way</string>
+    <string name="invert_horizontal_scroll">Invert horizontal scrolling</string>
+    <string name="invert_horizontal_scroll_hint">The side wheel scrolls the other way</string>
+    <string name="info_invert_scroll">The scroll direction setting in Logi Options+ only applies on Windows; turn this on if you want the same direction on the tablet. Applies only while TeamViewer is in front.</string>
     <string name="settings_keyboards">Keyboards</string>
     <string name="settings_keyboard_hint">While keys go to the PC, they do not type on the tablet</string>
     <string name="settings_no_keyboard">No keyboard found</string>

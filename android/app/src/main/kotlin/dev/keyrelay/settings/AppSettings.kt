@@ -25,6 +25,9 @@ data class AppSettings(
     val showKeys: Boolean = false,
     /** The status screen's one-time "How it works" card was dismissed. */
     val introSeen: Boolean = false,
+    /** Flip the mouse wheels' direction while the mouse is relayed (Logi Options+ applies its own setting on Windows only). */
+    val invertHorizontalScroll: Boolean = false,
+    val invertVerticalScroll: Boolean = false,
 ) {
     /** A value equal to its default is not stored, so a default changed in a later version reaches existing installs. */
     fun writeTo(p: MutablePreferences) {
@@ -41,6 +44,8 @@ data class AppSettings(
         put(TOGGLE, toggleKey, d.toggleKey)
         put(ONBOARDED, onboardingDone, d.onboardingDone)
         put(INTRO_SEEN, introSeen, d.introSeen)
+        put(INVERT_HSCROLL, invertHorizontalScroll, d.invertHorizontalScroll)
+        put(INVERT_VSCROLL, invertVerticalScroll, d.invertVerticalScroll)
         // Privacy setting: always stored, so a future default can never change the user's own choice.
         p[SHOW_KEYS] = showKeys
     }
@@ -57,6 +62,8 @@ data class AppSettings(
         private val ONBOARDED = booleanPreferencesKey("onboarding_done")
         private val SHOW_KEYS = booleanPreferencesKey("show_keys")
         private val INTRO_SEEN = booleanPreferencesKey("intro_seen")
+        private val INVERT_HSCROLL = booleanPreferencesKey("invert_horizontal_scroll")
+        private val INVERT_VSCROLL = booleanPreferencesKey("invert_vertical_scroll")
 
         /** Values the helper cannot use fall back to defaults: a bad pair of times would crash it on every start. */
         fun from(p: Preferences): AppSettings {
@@ -75,6 +82,8 @@ data class AppSettings(
                 onboardingDone = p[ONBOARDED] ?: d.onboardingDone,
                 showKeys = p[SHOW_KEYS] ?: d.showKeys,
                 introSeen = p[INTRO_SEEN] ?: d.introSeen,
+                invertHorizontalScroll = p[INVERT_HSCROLL] ?: d.invertHorizontalScroll,
+                invertVerticalScroll = p[INVERT_VSCROLL] ?: d.invertVerticalScroll,
             )
         }
     }

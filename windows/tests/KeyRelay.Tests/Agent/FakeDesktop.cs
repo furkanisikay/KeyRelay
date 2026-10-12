@@ -9,6 +9,7 @@ internal sealed class FakeDesktop : IInputDesktop
     private readonly HashSet<string> _rejecting = [];
     private readonly List<(ushort Scancode, uint Flags, string Desktop)> _sent = [];
     private readonly List<MediaKey> _media = [];
+    private readonly List<(uint Flags, uint Data, string Desktop)> _mouse = [];
     private string _input = "Default";
     private string _attached = "Default";
     private int _rejectNext;
@@ -56,15 +57,33 @@ internal sealed class FakeDesktop : IInputDesktop
     {
         lock (_gate)
         {
-            if (_rejectNext > 0)
-            {
-                _rejectNext--;
-                return false;
-            }
-            if (_attached != _input || _rejecting.Contains(_attached)) return false;
+            if (!AcceptsLocked()) return false;
             _sent.Add((scancode, flags, _attached));
             return true;
         }
+    }
+
+    public bool SendMouse(uint flags, uint data)
+    {
+        lock (_gate)
+        {
+            if (!AcceptsLocked()) return false;
+            _mouse.Add((flags, data, _attached));
+            return true;
+        }
+    }
+
+    /// <summary>Mouse button events sent, in order.</summary>
+    internal (uint Flags, uint Data, string Desktop)[] MouseSnapshot() { lock (_gate) return [.. _mouse]; }
+
+    private bool AcceptsLocked()
+    {
+        if (_rejectNext > 0)
+        {
+            _rejectNext--;
+            return false;
+        }
+        return _attached == _input && !_rejecting.Contains(_attached);
     }
 
     /// <summary>Gets or sets what the next media calls report.</summary>

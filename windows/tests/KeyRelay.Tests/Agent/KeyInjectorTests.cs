@@ -388,4 +388,75 @@ public sealed class KeyInjectorTests
 
         Assert.HasCount(8, _desktop.SentSnapshot());
     }
+
+    [TestMethod]
+    [DataRow((ushort)0x112, User32.MOUSEEVENTF_MIDDLEDOWN, User32.MOUSEEVENTF_MIDDLEUP, 0u, DisplayName = "middle")]
+    [DataRow((ushort)0x113, User32.MOUSEEVENTF_XDOWN, User32.MOUSEEVENTF_XUP, User32.XBUTTON1, DisplayName = "side -> X1")]
+    [DataRow((ushort)0x114, User32.MOUSEEVENTF_XDOWN, User32.MOUSEEVENTF_XUP, User32.XBUTTON2, DisplayName = "extra -> X2")]
+    [DataRow((ushort)0x116, User32.MOUSEEVENTF_XDOWN, User32.MOUSEEVENTF_XUP, User32.XBUTTON1, DisplayName = "back -> X1")]
+    public void Inject_MouseButtonPressRelease_SendsMouseDownUpAndNoKeys(ushort code, uint down, uint up, uint data)
+    {
+        var injector = Create();
+        var before = System.Diagnostics.Stopwatch.GetTimestamp();
+
+        var stamp = injector.Inject(code, 1);
+        injector.Inject(code, 0);
+
+        Assert.IsGreaterThanOrEqualTo(before, stamp);
+        CollectionAssert.AreEqual(new[] { (down, data, "Default"), (up, data, "Default") }, _desktop.MouseSnapshot());
+        Assert.IsEmpty(_desktop.SentSnapshot());
+    }
+
+    [TestMethod]
+    [DataRow((ushort)0x115, DisplayName = "forward")]
+    [DataRow((ushort)0x117, DisplayName = "task")]
+    public void Inject_GestureButton_SendsWinTabOnPressOnly(ushort code)
+    {
+        var injector = Create();
+
+        var stamp = injector.Inject(code, 1);
+        var released = injector.Inject(code, 0);
+        injector.ReleaseAll();
+
+        Assert.AreNotEqual(0, stamp);
+        Assert.AreEqual(0, released);
+        CollectionAssert.AreEqual(
+            new[] { ((ushort)0x5B, DOWN | EXTENDED, "Default"), ((ushort)0x0F, DOWN, "Default"), ((ushort)0x0F, UP, "Default"), ((ushort)0x5B, UP | EXTENDED, "Default") },
+            _desktop.SentSnapshot().Take(4).ToArray());
+        Assert.HasCount(4 + 8, _desktop.SentSnapshot(), "RELEASE_ALL adds only the modifier releases");
+        Assert.IsEmpty(_desktop.MouseSnapshot());
+    }
+
+    [TestMethod]
+    public void ReleaseAll_MouseButtonsHeld_ReleasesEachOnce()
+    {
+        var injector = Create();
+        injector.Inject(0x112, 1);
+        injector.Inject(0x114, 1);
+
+        injector.ReleaseAll();
+        injector.ReleaseAll();
+
+        CollectionAssert.AreEqual(
+            new[]
+            {
+                (User32.MOUSEEVENTF_MIDDLEDOWN, 0u, "Default"), (User32.MOUSEEVENTF_XDOWN, User32.XBUTTON2, "Default"),
+                (User32.MOUSEEVENTF_MIDDLEUP, 0u, "Default"), (User32.MOUSEEVENTF_XUP, User32.XBUTTON2, "Default"),
+            },
+            _desktop.MouseSnapshot());
+    }
+
+    [TestMethod]
+    public void Inject_MouseButtonRejectedTwice_RetriesOnFreshDesktopThenReportsNotWritable()
+    {
+        var injector = Create();
+        _desktop.Reject("Default");
+
+        injector.Inject(0x112, 1);
+
+        Assert.AreEqual(1, _desktop.ForcedAttaches);
+        Assert.IsFalse(injector.Writable);
+        CollectionAssert.AreEqual(new[] { (false, "Default") }, _reports);
+        Assert.IsEmpty(_desktop.MouseSnapshot());
+    }
 }

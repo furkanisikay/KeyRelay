@@ -45,7 +45,7 @@ düğümünü `EVIOCGRAB` ile kilitleyip olayları ağ üzerinden Windows'a gön
 
 ## Kapsam dışı
 
-- Fare/dokunmatik yönlendirme (TeamViewer taşır).
+- Fare hareketi/dokunmatik yönlendirme (TeamViewer taşır). Yalnız farenin ek tuşları PC'ye gider ("Fare tuşları").
 - Ekran aktarımı.
 - iOS, macOS, Linux hedefleri.
 - Birden fazla PC'ye aynı anda yönlendirme (tek aktif bağlantı; eşlenmiş birden çok PC arasında seçim vardır).
@@ -190,6 +190,22 @@ Girdiler: `enabled` (kullanıcı), `connected` (TLS + kabul), `pcReady` (PC duru
   Win+L → `LOCK`. Yutulan tuşun bırakma olayı da yutulur.
 - Bağlantı koparsa: gönderilemeyen olay atılır, `held` boşalınca grab kalkar.
 - Prototipte doğrulanan davranışlar regresyon testi olarak kalır.
+
+### Fare tuşları (P5)
+
+Android fare yan tuşlarını Geri/İleri tuşuna çevirir; TeamViewer bunları PC'ye taşımaz.
+
+- Fare düğümü: `EV_REL` + `BTN_LEFT` + en az bir `BTN_MIDDLE..BTN_TASK` taşıyan düğüm; yardımcının kendi sanal faresi
+  ("KeyRelay virtual mouse") adından tanınıp hiç seçilmez (`MouseRouting`).
+- Yardımcı ilk fare düğümünü bulunca `/dev/uinput` ile o farenin `EV_KEY/EV_REL/EV_MSC` bitlerini taşıyan bir sanal fare
+  açar (shell uid `uhid` grubunda). Açılamazsa helper loguna tek satır düşer ve davranış yalnız klavyedir.
+- Fare düğümü klavyeyle aynı anda yakalanır ve bırakılır. Yakalıyken `BTN_MIDDLE..BTN_TASK` durum makinesine gider
+  (klavye tuşu gibi `held`'e girer, PC'ye `KEY` çerçevesiyle gider); hareket, tekerlekler, sol/sağ tuş, `EV_MSC` ve `SYN`
+  sanal fareye aynen yazılır, Android imleci normal çalışır. Yakalı değilken fare Android'indir; ek tuşlar yalnız `held`
+  için durum makinesine girer.
+- Yakalama bırakılırken ya da fare düğümü kaybolurken sanal farede basılı kalan tuş bırakılır (takılı sürükleme olmaz).
+- Fare tuşları tekrar üretmez; uygulamaya tuş göster/nabız sinyali gitmez.
+- Windows eşlemesi `docs/protocol.md` "Mesajlar" altındadır.
 
 ### Görsel tasarım (Android + Windows)
 

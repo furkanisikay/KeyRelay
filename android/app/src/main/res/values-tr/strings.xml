@@ -159,6 +159,12 @@
     <string name="settings_shortcut_hint">Ctrl Alt ve bu tuş, tuşları PC\'ye göndermeyi açıp kapatır. Gönderme kapalıyken Ctrl Alt Space Samsung klavyenin dilini de değiştirir.</string>
     <string name="settings_privacy">Gizlilik</string>
     <string name="settings_show_keys_hint">Durum ekranındaki gözle aynı ayar. Kapalıyken hangi tuşa bastığın uygulama ekranına hiç gelmez.</string>
+    <string name="settings_mouse">Fare</string>
+    <string name="invert_vertical_scroll">Dikey kaydırmayı ters çevir</string>
+    <string name="invert_vertical_scroll_hint">Tekerlek ters yöne kaydırır</string>
+    <string name="invert_horizontal_scroll">Yatay kaydırmayı ters çevir</string>
+    <string name="invert_horizontal_scroll_hint">Yan tekerlek ters yöne kaydırır</string>
+    <string name="info_invert_scroll">Logi Options+\'taki kaydırma yönü ayarı yalnız Windows\'ta geçerli; tablette aynı yönü istiyorsan aç. Yalnız TeamViewer öndeyken uygulanır.</string>
     <string name="settings_keyboards">Klavyeler</string>
     <string name="settings_keyboard_hint">Tuşlar PC\'ye giderken tablete yazmaz</string>
     <string name="settings_no_keyboard">Klavye bulunamadı</string>

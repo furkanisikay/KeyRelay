@@ -9,6 +9,7 @@ import dev.keyrelay.core.Endpoint
 import dev.keyrelay.core.ForegroundTracker
 import dev.keyrelay.core.KeyPulse
 import dev.keyrelay.core.KeyRepeat
+import dev.keyrelay.core.MouseRouting
 import dev.keyrelay.core.RelayClient
 import dev.keyrelay.core.RelayStateMachine
 import dev.keyrelay.core.RttWatch
@@ -26,10 +27,10 @@ class Helper(private val appUid: Int) : IKeyRelayHelper.Stub(), RelayStateMachin
     private val input = InputReader(
         sink = ::onInputKey,
         onKeyboards = ::onKeyboards,
-        onNodeLost = {
+        onNodeLost = { mouse ->
             synchronized(lock) {
-                machine.releaseHeld()
-                repeat.stop()
+                machine.releaseHeld(mouse)
+                if (!mouse) repeat.stop()
             }
         },
     )
@@ -79,7 +80,8 @@ class Helper(private val appUid: Int) : IKeyRelayHelper.Stub(), RelayStateMachin
         if (value == 2) return
         val armed = synchronized(lock) {
             machine.onKey(code, value)
-            repeat.onKey(code, value, machine.grabbed, SystemClock.uptimeMillis())
+            // A mouse click does not end a key's repeat, as on a PC.
+            if (!MouseRouting.isButton(code)) repeat.onKey(code, value, machine.grabbed, SystemClock.uptimeMillis())
             value == 1 && repeat.code == code
         }
         if (armed) LockSupport.unpark(repeater)
@@ -116,6 +118,8 @@ class Helper(private val appUid: Int) : IKeyRelayHelper.Stub(), RelayStateMachin
     override fun configure(config: RelayConfig) {
         checkCaller()
         showKeys = config.showKeys
+        input.invertHorizontalScroll = config.invertHorizontalScroll
+        input.invertVerticalScroll = config.invertVerticalScroll
         val next = try {
             config.endpoints?.takeIf { it.isNotEmpty() }?.let { endpoints ->
                 ConnectionConfig(
@@ -196,6 +200,7 @@ class Helper(private val appUid: Int) : IKeyRelayHelper.Stub(), RelayStateMachin
 
     override fun sendKey(code: Int, value: Int) {
         client?.sendKey(code, value)
+        if (MouseRouting.toPc(code)) return
         // Nothing leaves while no status screen watches; the key itself only while the user chose to show keys.
         // It is never logged or kept.
         val signal = keyPulse.next(code, value, SystemClock.uptimeMillis(), keyWatch, showKeys)

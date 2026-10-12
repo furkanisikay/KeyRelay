@@ -26,6 +26,8 @@ object RelayConfigFactory {
             sendTimeoutMs = s.sendTimeoutMs
             enabled = s.enabled
             showKeys = s.showKeys
+            invertHorizontalScroll = s.invertHorizontalScroll
+            invertVerticalScroll = s.invertVerticalScroll
         }
     }
 }

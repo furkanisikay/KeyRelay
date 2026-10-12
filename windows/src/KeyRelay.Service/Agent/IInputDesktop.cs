@@ -16,6 +16,10 @@ internal interface IInputDesktop
     /// <returns>true when Windows accepted the event.</returns>
     bool SendKey(ushort scancode, uint flags);
 
+    /// <summary>Calls SendInput with exactly one mouse button event at the current cursor position.</summary>
+    /// <returns>true when Windows accepted the event.</returns>
+    bool SendMouse(uint flags, uint data);
+
     /// <summary>Presses and releases a media key as a virtual key through SendInput.</summary>
     /// <returns>Whether SendInput took both events, and its results for the service log (never a typed key).</returns>
     (bool Ok, string Detail) Media(MediaKey key);

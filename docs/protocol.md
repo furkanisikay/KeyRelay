@@ -38,6 +38,11 @@ TLS 1.3 üstünde çerçeveler: `u16 uzunluk (big-endian, tip dahil) | u8 tip | 
   üretmez. (P4'te ajan tarafı tekrar denendi: geç gelen bırakma fazladan karakter yazdırdı, kaldırıldı.)
 - Medya tuşları (113–115, 163–166) yalnız basışta, `SendInput` sanal tuşu (`VK_VOLUME_*`, `VK_MEDIA_*`; basış +
   bırakma) olarak gönderilir; ses kilit ekranında da, parça tuşları yalnız `Default` masaüstünde.
+- Fare tuşları da `KEY` çerçevesiyle gelir (evdev `BTN_*`, protokol değişmez; eski ajan bunları yok sayıp `KEY_DONE`
+  döner). Ajan `SendInput` fare girdisine çevirir: `BTN_MIDDLE (0x112)` → orta tuş; `BTN_SIDE (0x113)` ve
+  `BTN_BACK (0x116)` → `XBUTTON1`; `BTN_EXTRA (0x114)` → `XBUTTON2`; basış/bırakma ayrı, tekrar yok, basılıysa
+  `RELEASE_ALL` bırakır. `BTN_FORWARD (0x115)` ve `BTN_TASK (0x117)` (hareket tuşu) yalnız basışta Win+Tab (Görev
+  Görünümü) olur. Masaüstü/yazılabilirlik kuralı ve `KEY_DONE` gecikme ölçümü tuşlardaki gibidir.
 
 ## Eşleştirme, kimlik doğrulama ve canlılık
 

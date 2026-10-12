@@ -63,6 +63,16 @@ internal sealed class NativeInputDesktop : IInputDesktop
         return User32.SendInput(1, &input, sizeof(User32.Input)) == 1;
     }
 
+    public unsafe bool SendMouse(uint flags, uint data)
+    {
+        var input = new User32.Input
+        {
+            Type = User32.INPUT_MOUSE,
+            Union = new User32.InputUnion { Mouse = new User32.MouseInput { MouseData = data, Flags = flags } },
+        };
+        return User32.SendInput(1, &input, sizeof(User32.Input)) == 1;
+    }
+
     public bool LockWorkStation() => User32.LockWorkStation();
 
     /// <summary>Presses and releases the media key's virtual key (no scancode) on the input desktop; Windows shows its volume/media overlay.</summary>

@@ -4,7 +4,14 @@ namespace KeyRelay.Service.Native;
 
 internal static partial class User32
 {
+    internal const uint INPUT_MOUSE = 0;
     internal const uint INPUT_KEYBOARD = 1;
+    internal const uint MOUSEEVENTF_MIDDLEDOWN = 0x0020;
+    internal const uint MOUSEEVENTF_MIDDLEUP = 0x0040;
+    internal const uint MOUSEEVENTF_XDOWN = 0x0080;
+    internal const uint MOUSEEVENTF_XUP = 0x0100;
+    internal const uint XBUTTON1 = 0x0001;
+    internal const uint XBUTTON2 = 0x0002;
     internal const uint KEYEVENTF_EXTENDEDKEY = 0x0001;
     internal const uint KEYEVENTF_KEYUP = 0x0002;
     internal const uint KEYEVENTF_SCANCODE = 0x0008;
