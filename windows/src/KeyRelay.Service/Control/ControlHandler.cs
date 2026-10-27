@@ -65,6 +65,7 @@ internal sealed partial class ControlHandler(ControlContext context, ILogger<Con
     private ControlStatus Status()
     {
         var latency = context.Latency.Snapshot();
+        var last = context.Hub.Last;
         return new ControlStatus
         {
             AgentConnected = context.Agent.Connected,
@@ -73,6 +74,9 @@ internal sealed partial class ControlHandler(ControlContext context, ILogger<Con
             Writable = context.Agent.Writable,
             Ready = context.Agent.Ready,
             ConnectedDevice = context.Hub.ActiveDeviceName,
+            Sessions = last.Count,
+            LastSessionDevice = last.Device,
+            LastSessionViaFunnel = last.ViaLoopback,
             Heartbeats = context.Hub.ActivePings,
             LatencyP50Micros = latency.P50Micros,
             LatencyP99Micros = latency.P99Micros,

@@ -15,19 +15,23 @@ internal static class PairingAddresses
     /// <param name="DnsSuffix">Connection DNS suffix; on the Tailscale interface it is the tailnet domain.</param>
     internal sealed record InterfaceAddress(IPAddress Address, bool HasGateway, string DnsSuffix);
 
-    /// <summary>Funnel address, then Tailscale IP and MagicDNS name, then LAN addresses of interfaces with a gateway.</summary>
-    /// <remarks>Interfaces without a gateway (host-only virtual adapters, some VPNs) would cost the tablet a 2 s timeout each.</remarks>
+    /// <summary>Tailscale IP and MagicDNS name, then LAN addresses of interfaces with a gateway, then the Funnel address.</summary>
+    /// <remarks>
+    /// Interfaces without a gateway (host-only virtual adapters, some VPNs) would cost the tablet a 2 s timeout each.
+    /// Funnel goes last: the tablet pairs over the first address that answers and the service refuses PAIR from Funnel
+    /// (loopback). Later HELLOs are not slowed for long, the tablet moves the address that answered to the front.
+    /// </remarks>
     internal static List<string> Order(IEnumerable<InterfaceAddress> interfaces, string funnelAddress, string hostName)
     {
         var all = interfaces.ToList();
         var result = new List<string>();
-        if (funnelAddress.Length > 0) result.Add(funnelAddress);
         foreach (var tailscale in all.Where(i => IsTailscale(i.Address)))
         {
             result.Add(tailscale.Address.ToString());
             if (tailscale.DnsSuffix.Length > 0) result.Add($"{hostName.ToLowerInvariant()}.{tailscale.DnsSuffix}");
         }
         result.AddRange(all.Where(i => i.HasGateway && !IsTailscale(i.Address)).Select(i => i.Address.ToString()));
+        if (funnelAddress.Length > 0) result.Add(funnelAddress);
         return [.. result.Distinct(StringComparer.OrdinalIgnoreCase)];
     }
 

@@ -15,6 +15,9 @@
   <data name="TrayTooltipReady" xml:space="preserve"><value>KeyRelay · tablet bağlı, tuşların buraya geliyor</value></data>
   <data name="TrayTooltipWaiting" xml:space="preserve"><value>KeyRelay · tablet bekleniyor</value></data>
   <data name="TrayTooltipError" xml:space="preserve"><value>KeyRelay · bu bilgisayarda çalışmıyor</value></data>
+  <data name="NotifyConnectedTitle" xml:space="preserve"><value>Tablet bağlandı</value></data>
+  <data name="NotifyConnectedDirect" xml:space="preserve"><value>{0} yerel ağdan ya da tailnet'ten bağlandı.</value></data>
+  <data name="NotifyConnectedFunnel" xml:space="preserve"><value>{0} internetten (Funnel) bağlandı. Sen değilsen cihazı Cihazlar sayfasından kaldır.</value></data>
   <data name="NoValue" xml:space="preserve"><value>–</value></data>
   <data name="StatusTitle.Text" xml:space="preserve"><value>Durum</value></data>
   <data name="StatusLeadRunning" xml:space="preserve"><value>KeyRelay çalışıyor · tabletten bastığın tuşlar bu bilgisayara yazılabilir</value></data>

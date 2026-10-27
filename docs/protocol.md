@@ -47,7 +47,12 @@ TLS 1.3 üstünde çerçeveler: `u16 uzunluk (big-endian, tip dahil) | u8 tip | 
 ## Eşleştirme, kimlik doğrulama ve canlılık
 
 - QR içeriği: `keyrelay://pair?v=1&n=<PC adı>&a=<adres1>,<adres2>,...&p=<port>&fp=<sertifika SPKI SHA-256, base64url>&c=<kod, base64url>`.
-  Kod 5 dk geçerli, tek kullanımlık. İstemci adresleri sırayla dener (2 sn timeout), son başarılıyı başa alır.
+  Kod 5 dk geçerli, tek kullanımlık. İstemci adresleri sırayla dener (TCP bağlantısı 2 sn, TLS el sıkışması 8 sn
+  timeout), son başarılıyı başa alır. El sıkışması ayrı ve uzun: Funnel'da TCP Tailscale'in ingress'inde hemen biter,
+  TLS cevabı PC'ye tailnet üzerinden ulaşıldıktan sonra gelir (evden ~1,3 sn, VPN ile daha uzun).
+  QR sırası: Tailscale IP ve MagicDNS adı, ağ geçidi olan LAN adresleri, en sonda Funnel adresi. Funnel sonda çünkü
+  servis loopback'ten (Funnel'dan) gelen `PAIR`'i `REJECT(INVALID_CODE)` ile reddeder: eşleştirme LAN'dan ya da
+  tailnet'ten yapılır, `HELLO` Funnel'dan da kabul edilir.
   Adres girdisi `host:port` olabilir; port yoksa `p` kullanılır. Funnel adresi yalnız 443, 8443 veya 10000 portunda olabilir
   (Funnel kısıtı) ve istemci TLS'te SNI olarak host adını gönderir (Funnel yönlendirmesi SNI'ye bakar).
 - `n` (PC adı) yüzde kodlanır (RFC 3986; boşluk `%20`, `+` `%2B`); `a` listesindeki adresler kodlanmaz (yalnız harf, rakam, `.`, `-`, `:`), ayırıcı virgüldür.
@@ -56,6 +61,10 @@ TLS 1.3 üstünde çerçeveler: `u16 uzunluk (big-endian, tip dahil) | u8 tip | 
 - İstemci TLS'te yalnız sabitlenmiş SPKI parmak izini kabul eder (CA zinciri ve ad doğrulanmaz).
 - HELLO 5 sn içinde gelmezse bağlantı kapanır. Token karşılaştırması sabit zamanlı.
 - Kimlik doğrulama hataları cihaz/IP başına üstel geri çekilmeyle yavaşlatılır.
+- `HELLO` bekleyen (TLS el sıkışması dahil) bağlantı sayısı loopback (Funnel) ve doğrudan kaynaklar için ayrı ayrı
+  en çok 8'dir; aşan bağlantı TLS'e başlamadan kapatılır. Doğrulanmış oturum bu sayıya girmez.
+- Eşleştirme, bağlantı, red ve el sıkışma hataları Application olay günlüğüne de yazılır (kaynak `KeyRelay.Service`);
+  kimliği doğrulanmamış tarafın tetikleyebildiği satırlar dakikada 20 ile sınırlıdır, atlananların sayısı sonraki satırda yazılır.
 - Bağlantı koparsa servis ajana `RELEASE_ALL` gönderir; basılı tuş kümesini yalnız ajan tutar (servis tuş durumu izlemez).
 - Servis→ajan pipe yazımı `agentWriteTimeout` (1 sn, iç sabit) taşır; aşılırsa ajan ölü sayılır, sonlandırılıp yeniden
   başlatılır. Ajanın 500 ms masaüstü izleme aralığı iç sabittir: kullanıcı deneyimini belirleyen süre canlılık/hazır

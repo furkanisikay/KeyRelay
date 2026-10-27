@@ -16,12 +16,12 @@ public sealed class PairingAddressesTests
     ];
 
     [TestMethod]
-    public void Order_HomepcInterfaces_KeepsTailscaleAndGatewayLanOnly()
+    public void Order_HomepcInterfaces_KeepsTailscaleAndGatewayLanOnlyFunnelLast()
     {
         var addresses = PairingAddresses.Order(HOMEPC, "homepc.tailnet-example.ts.net:8443", "HOMEPC");
 
         CollectionAssert.AreEqual(
-            new[] { "homepc.tailnet-example.ts.net:8443", "100.64.0.10", "homepc.tailnet-example.ts.net", "192.168.1.10" },
+            new[] { "100.64.0.10", "homepc.tailnet-example.ts.net", "192.168.1.10", "homepc.tailnet-example.ts.net:8443" },
             addresses);
     }
 

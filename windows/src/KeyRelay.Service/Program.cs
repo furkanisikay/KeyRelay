@@ -7,6 +7,7 @@ using KeyRelay.Service.Session;
 using KeyRelay.Service.Settings;
 using KeyRelay.Service.Setup;
 using Microsoft.Extensions.Hosting.WindowsServices;
+using Microsoft.Extensions.Logging.EventLog;
 
 if (args.Length > 0 && args[0] == "--agent") return AgentHost.RunAgent(args);
 if (args.Length > 0 && args[0] is "install" or "uninstall") return await Installer.RunAsync(args).ConfigureAwait(false);
@@ -17,6 +18,9 @@ Installer.SecureDataDirectory(data);
 using var logs = new LogBuffer();
 var builder = Host.CreateApplicationBuilder(args);
 builder.Logging.AddProvider(logs);
+// The event log keeps Warning and above by default; the hub's Information lines (connections, handshake failures) are
+// security events and must outlive the 500-line buffer and a service restart.
+builder.Logging.AddFilter<EventLogLoggerProvider>(typeof(RelayHub).FullName, LogLevel.Information);
 var services = builder.Services;
 services.AddWindowsService(options => options.ServiceName = Installer.SERVICE_NAME);
 if (WindowsServiceHelpers.IsWindowsService()) services.AddSingleton<IHostLifetime, SessionAwareServiceLifetime>();

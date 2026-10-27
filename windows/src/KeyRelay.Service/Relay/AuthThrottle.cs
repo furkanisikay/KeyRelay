@@ -2,7 +2,8 @@ namespace KeyRelay.Service.Relay;
 
 /// <summary>
 /// Slows failed PAIR and HELLO attempts per key (source address plus device id, or "pair"): 1 s, 2 s, 4 s ... up to 60 s.
-/// Funnel traffic arrives from loopback, so the device id keeps one attacker from blocking a real tablet.
+/// Funnel traffic arrives from loopback, so the device id keeps one attacker from blocking a real tablet; PAIR from
+/// loopback is refused before it reaches the throttle.
 /// </summary>
 internal sealed class AuthThrottle(TimeProvider time)
 {

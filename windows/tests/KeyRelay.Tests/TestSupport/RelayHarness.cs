@@ -20,7 +20,7 @@ internal sealed class RelayHarness : IAsyncDisposable
     private Task _agentRun = Task.CompletedTask;
     private int _sasCalls;
 
-    private RelayHarness(int idleTimeoutSeconds, TimeSpan helloTimeout)
+    private RelayHarness(int idleTimeoutSeconds, TimeSpan helloTimeout, bool allowLoopbackPairing, int maxPendingHandshakes)
     {
         Settings = new SettingsStore(_directory.Path);
         Settings.Save(new ServiceSettings { IdleTimeoutSeconds = idleTimeoutSeconds });
@@ -35,6 +35,10 @@ internal sealed class RelayHarness : IAsyncDisposable
         var context = new RelayContext(Certificate, Devices, Pairing, Throttle, Agent, Recent, () => Interlocked.Increment(ref _sasCalls), Settings, NullLogger.Instance)
         {
             HelloTimeout = helloTimeout,
+            // The test tablet connects over loopback, where the service refuses PAIR (it is Funnel there).
+            AllowLoopbackPairing = allowLoopbackPairing,
+            MaxPendingHandshakes = maxPendingHandshakes,
+            Time = Time,
         };
         Hub = new RelayHub(context, NullLogger<RelayHub>.Instance);
         _listener.Bind(new IPEndPoint(IPAddress.Loopback, 0));
@@ -85,9 +89,10 @@ internal sealed class RelayHarness : IAsyncDisposable
 
     internal int Port => ((IPEndPoint)_listener.LocalEndPoint!).Port;
 
-    internal static async Task<RelayHarness> StartAsync(bool connectAgent = true, int idleTimeoutSeconds = 20, double helloTimeoutSeconds = 5)
+    internal static async Task<RelayHarness> StartAsync(
+        bool connectAgent = true, int idleTimeoutSeconds = 20, double helloTimeoutSeconds = 5, bool allowLoopbackPairing = true, int maxPendingHandshakes = 8)
     {
-        var harness = new RelayHarness(idleTimeoutSeconds, TimeSpan.FromSeconds(helloTimeoutSeconds));
+        var harness = new RelayHarness(idleTimeoutSeconds, TimeSpan.FromSeconds(helloTimeoutSeconds), allowLoopbackPairing, maxPendingHandshakes);
         if (connectAgent) await harness.ConnectAgentAsync();
         return harness;
     }

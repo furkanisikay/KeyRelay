@@ -24,6 +24,8 @@ public sealed partial class App : Application
     private MenuFlyoutItem? _trayHeader;
     private DispatcherQueueTimer? _poll;
     private TrayState? _trayState;
+    // Session count of the last answered poll; null after a failed one, so a restarted service sets a new baseline.
+    private long? _seenSessions;
     private int _failures;
     private bool _polling;
     private bool _exiting;
@@ -197,7 +199,21 @@ public sealed partial class App : Application
             _poll.Start();
         }
         UpdateTrayIcon();
+        NotifyNewSession();
         StatusChanged?.Invoke();
+    }
+
+    // Every tablet connection is announced, so one made with a stolen token does not go unseen; the session count also
+    // catches one that ended between two polls.
+    private void NotifyNewSession()
+    {
+        var status = Status;
+        if (status is not null && _seenSessions is { } seen && status.Sessions > seen && status.LastSessionDevice is { } device)
+        {
+            var message = Ui.Format(status.LastSessionViaFunnel ? "NotifyConnectedFunnel" : "NotifyConnectedDirect", device);
+            _trayIcon?.ShowNotification(Ui.Text("NotifyConnectedTitle"), message);
+        }
+        _seenSessions = status?.Sessions;
     }
 
     private void ListenForShowRequests()

@@ -96,15 +96,15 @@ public sealed class ControlServerTests
     }
 
     [TestMethod]
-    public async Task SetFunnel_Valid_IsFirstAddressOfNextPairing()
+    public async Task SetFunnel_Valid_IsLastAddressOfNextPairing()
     {
         await using var fixture = await Fixture.StartAsync();
 
         await fixture.Client.SendAsync(new ControlRequest(ControlOps.SET_FUNNEL, FunnelAddress: "pc.tail.ts.net:8443"));
         var pairing = (await fixture.Client.SendAsync(new ControlRequest(ControlOps.PAIR_START))).Pairing!;
 
-        Assert.AreEqual("pc.tail.ts.net:8443", pairing.Addresses[0]);
-        Assert.IsTrue(pairing.Link.Contains("&a=pc.tail.ts.net:8443", StringComparison.Ordinal));
+        Assert.AreEqual("pc.tail.ts.net:8443", pairing.Addresses[^1]);
+        Assert.IsTrue(pairing.Link.Contains("pc.tail.ts.net:8443&p=", StringComparison.Ordinal));
     }
 
     [TestMethod]

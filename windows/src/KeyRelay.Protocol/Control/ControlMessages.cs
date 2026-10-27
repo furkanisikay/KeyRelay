@@ -84,6 +84,15 @@ public sealed record ControlStatus
 
     public string? ConnectedDevice { get; init; }
 
+    /// <summary>Gets how many tablet sessions were verified since the service started; a change means a new connection.</summary>
+    public long Sessions { get; init; }
+
+    /// <summary>Gets the device of the newest session, kept after it ends so even a short connection gets reported.</summary>
+    public string? LastSessionDevice { get; init; }
+
+    /// <summary>Gets whether the newest session came through Tailscale Funnel (the internet) rather than the LAN or tailnet.</summary>
+    public bool LastSessionViaFunnel { get; init; }
+
     /// <summary>Gets how many heartbeats (PINGs) the connected tablet sent on this connection; a change means it is alive.</summary>
     public long Heartbeats { get; init; }
 
