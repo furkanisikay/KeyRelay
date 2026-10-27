@@ -100,6 +100,14 @@ class RelayClientTest {
     }
 
     @Test
+    fun start_handshakeSlowerThanConnectTimeout_stillConnects() {
+        // Funnel: TCP ends at Tailscale's ingress at once, the TLS answer comes seconds later.
+        val s = server(FakeRelayServer.Behavior(handshakeDelayMs = TlsDialer.CONNECT_TIMEOUT_MS + 1_000L))
+        start(local(s))
+        assertEquals("connected TestPC 127.0.0.1:${s.port}", events.await("connected"))
+    }
+
+    @Test
     fun start_firstEndpointDead_usesSecondAndMovesItFirst() {
         val s = server()
         val dead = Endpoint("127.0.0.1", unusedPort())

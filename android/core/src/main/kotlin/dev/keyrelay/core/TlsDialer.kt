@@ -21,6 +21,13 @@ import javax.net.ssl.X509TrustManager
 object TlsDialer {
     const val CONNECT_TIMEOUT_MS = 2_000
 
+    /**
+     * TLS handshake after the TCP connect. Through Funnel the TCP connect ends at Tailscale's ingress, which only then
+     * reaches the PC over the tailnet: the handshake took 1.3 s from home and more over a VPN, so 2 s dropped Funnel.
+     * Only an address that accepted TCP waits this long; dead LAN or tailnet addresses still fail after 2 s.
+     */
+    const val HANDSHAKE_TIMEOUT_MS = 8_000
+
     /** Thrown when every address answered with a different key: the PC was reinstalled and must be paired again. */
     class PinMismatchException : IOException("server key does not match the paired PC")
 
@@ -48,7 +55,7 @@ object TlsDialer {
         val raw = Socket()
         try {
             raw.connect(InetSocketAddress(resolve(e.host), e.port), CONNECT_TIMEOUT_MS)
-            raw.soTimeout = CONNECT_TIMEOUT_MS
+            raw.soTimeout = HANDSHAKE_TIMEOUT_MS
             raw.tcpNoDelay = true
             val tls = context.socketFactory.createSocket(raw, e.host, e.port, true) as SSLSocket
             tls.enabledProtocols = arrayOf("TLSv1.3")

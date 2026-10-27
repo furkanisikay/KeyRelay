@@ -31,6 +31,8 @@ class FakeRelayServer(
         val answerPings: Boolean = true,
         val readAfterWelcome: Boolean = true,
         val log: Boolean = false,
+        /** Waits this long after the TCP accept before the TLS handshake, like Tailscale Funnel reaching the PC. */
+        val handshakeDelayMs: Long = 0,
     )
 
     val received = LinkedBlockingQueue<Frame>()
@@ -54,6 +56,7 @@ class FakeRelayServer(
 
     private fun handle(socket: SSLSocket) {
         socket.use { s ->
+            Thread.sleep(behavior.handshakeDelayMs)
             s.startHandshake()
             sniNames.put((s.session as ExtendedSSLSession).requestedServerNames.map { (it as SNIHostName).asciiName })
             val input = BufferedInputStream(s.inputStream)
