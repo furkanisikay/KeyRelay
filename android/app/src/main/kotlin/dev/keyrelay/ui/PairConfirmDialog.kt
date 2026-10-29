@@ -377,13 +377,15 @@ private fun planeOffset(t: Float, from: Offset, to: Offset) = Offset((to.x - fro
 private fun SendStatus(phase: PairPhase, pcName: String, failure: String?) {
     val text = when (phase) {
         PairPhase.WAITING, PairPhase.FOLDING -> stringResource(R.string.pair_sending, pcName)
-        PairPhase.FAILED -> failure.orEmpty()
+        // The button returns to "Pair" after FAIL_HOLD_MS; the reason stays until the next attempt so it can be read.
+        PairPhase.FAILED, PairPhase.CONFIRM -> failure.orEmpty()
         else -> ""
     }
     if (text.isEmpty()) return
+    val failed = phase == PairPhase.FAILED || phase == PairPhase.CONFIRM
     Text(
         text, fontSize = 13.sp, fontWeight = FontWeight.Bold,
-        color = if (phase == PairPhase.FAILED) MaterialTheme.colorScheme.error else MaterialTheme.colorScheme.onSurfaceVariant,
+        color = if (failed) MaterialTheme.colorScheme.error else MaterialTheme.colorScheme.onSurfaceVariant,
         modifier = Modifier.padding(top = 10.dp).semantics { liveRegion = LiveRegionMode.Polite },
     )
 }
