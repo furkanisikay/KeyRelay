@@ -1,5 +1,7 @@
 package dev.keyrelay.ui
 
+import dev.keyrelay.R
+import dev.keyrelay.core.Frame
 import dev.keyrelay.core.KeyPulse
 import dev.keyrelay.core.RelayStateMachine
 import dev.keyrelay.service.PairResult
@@ -52,6 +54,15 @@ class StatusFormattingTest {
         assertEquals(null, pairedIdOf(PairResult.Rejected(3)))
         assertEquals(null, pairedIdOf(PairResult.Unreachable("java.lang.IllegalStateException")))
         assertEquals("ab", pairedIdOf(PairResult.Paired("pc", "ab")))
+    }
+
+    @Test
+    fun pairFailRes_pairingFromOutside_saysJoinHomeNetwork_otherRejectsStayGeneric() {
+        assertEquals(R.string.pair_not_allowed_here, pairFailRes(PairResult.Rejected(Frame.Reject.PAIRING_NOT_ALLOWED_HERE)))
+        assertEquals(R.string.pair_rejected, pairFailRes(PairResult.Rejected(Frame.Reject.INVALID_CODE)))
+        // A reason from a newer PC this app does not know yet.
+        assertEquals(R.string.pair_rejected, pairFailRes(PairResult.Rejected(99)))
+        assertEquals(null, pairFailRes(PairResult.Paired("pc", "ab")))
     }
 
     @Test

@@ -23,7 +23,7 @@ internal static class FrameRules
         FrameType.Paired => payload.Length == Frames.ID_SIZE + Frames.TOKEN_SIZE,
         FrameType.Hello => payload.Length == 1 + Frames.ID_SIZE + Frames.TOKEN_SIZE,
         FrameType.Welcome => true,
-        FrameType.Reject => payload.Length == 1 && payload[0] is >= 1 and <= 3,
+        FrameType.Reject => payload.Length == 1 && payload[0] is >= 1 and <= 4,
         FrameType.Key => payload.Length == 3 && payload[2] <= 2,
         FrameType.State => payload.Length == 1,
         FrameType.Sas or FrameType.Lock or FrameType.ReleaseAll => payload.IsEmpty,

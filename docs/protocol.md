@@ -23,7 +23,7 @@ TLS 1.3 üstünde çerçeveler: `u16 uzunluk (big-endian, tip dahil) | u8 tip | 
 | S→C | `0x02 PAIRED` | `16B cihaz kimliği, 32B cihaz token'ı` |
 | C→S | `0x03 HELLO` | `u8 sürüm, 16B cihaz kimliği, 32B token` |
 | S→C | `0x04 WELCOME` | `utf8 PC adı` |
-| S→C | `0x05 REJECT` | `u8 neden (1 sürüm, 2 bilinmeyen cihaz, 3 kod geçersiz/süresi dolmuş)` |
+| S→C | `0x05 REJECT` | `u8 neden (1 sürüm, 2 bilinmeyen cihaz, 3 kod geçersiz/süresi dolmuş, 4 eşleştirme bu yoldan yapılamaz)` |
 | C→S | `0x10 KEY` | `u16 evdev keycode, u8 değer (0 bırak, 1 bas, 2 tekrar)` |
 | S→C | `0x11 STATE` | `u8 bayrak (bit0 hazır)` |
 | C→S | `0x12 SAS` | — (Ctrl+Alt+Del; Del yutulur, Ctrl/Alt basma-bırakmaları normal KEY olarak akar) |
@@ -51,8 +51,11 @@ TLS 1.3 üstünde çerçeveler: `u16 uzunluk (big-endian, tip dahil) | u8 tip | 
   timeout), son başarılıyı başa alır. El sıkışması ayrı ve uzun: Funnel'da TCP Tailscale'in ingress'inde hemen biter,
   TLS cevabı PC'ye tailnet üzerinden ulaşıldıktan sonra gelir (evden ~1,3 sn, VPN ile daha uzun).
   QR sırası: Tailscale IP ve MagicDNS adı, ağ geçidi olan LAN adresleri, en sonda Funnel adresi. Funnel sonda çünkü
-  servis loopback'ten (Funnel'dan) gelen `PAIR`'i `REJECT(INVALID_CODE)` ile reddeder: eşleştirme LAN'dan ya da
-  tailnet'ten yapılır, `HELLO` Funnel'dan da kabul edilir.
+  servis loopback'ten (Funnel'dan) gelen `PAIR`'i `REJECT(PAIRING_NOT_ALLOWED_HERE = 4)` ile reddeder (kod harcanmaz,
+  aynı QR evden yeniden denenebilir): eşleştirme LAN'dan ya da tailnet'ten yapılır, `HELLO` Funnel'dan da kabul edilir.
+  Ayrı neden, tabletin "kod yanlış" yerine "ev ağına ya da Tailscale'e bağlan" diyebilmesi için. Uyumluluk: tablet
+  `REJECT` nedenini aralık denetlemeden okur, eski tablet 4'ü de diğer `PAIR` retleri gibi "PC kodu kabul etmedi"
+  diye gösterir (öncekiyle aynı); yeni tablet eski PC'den 3 alırsa yine o genel mesajı gösterir. Sürüm denetimi gerekmez.
   Adres girdisi `host:port` olabilir; port yoksa `p` kullanılır. Funnel adresi yalnız 443, 8443 veya 10000 portunda olabilir
   (Funnel kısıtı) ve istemci TLS'te SNI olarak host adını gönderir (Funnel yönlendirmesi SNI'ye bakar).
 - `n` (PC adı) yüzde kodlanır (RFC 3986; boşluk `%20`, `+` `%2B`); `a` listesindeki adresler kodlanmaz (yalnız harf, rakam, `.`, `-`, `:`), ayırıcı virgüldür.

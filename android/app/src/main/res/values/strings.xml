@@ -97,6 +97,7 @@
     <string name="pair_confirm_body">Continue only if you opened this QR code on your own PC.</string>
     <string name="pair_confirm">Pair</string>
     <string name="pair_rejected">The PC did not accept the code. Open a new QR code and try again.</string>
+    <string name="pair_not_allowed_here">Pairing works only on your home network or with Tailscale on. Connect the tablet to the same Wi-Fi as the PC (not a guest network) or turn on Tailscale, then try again; this QR code still works.</string>
     <string name="pair_unreachable">Could not reach the PC. Check the PC is on and KeyRelay is running; away from home, access from outside must be on at the PC.</string>
     <string name="pair_key_mismatch">The PC\'s security ID does not match this QR code. Open a new QR code on the PC.</string>
     <string name="pair_not_saved">The pairing could not be saved on this tablet. Open a new QR code on the PC and try again.</string>

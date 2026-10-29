@@ -91,6 +91,7 @@ import com.google.mlkit.vision.barcode.common.Barcode
 import com.google.mlkit.vision.codescanner.GmsBarcodeScannerOptions
 import com.google.mlkit.vision.codescanner.GmsBarcodeScanning
 import dev.keyrelay.R
+import dev.keyrelay.core.Frame
 import dev.keyrelay.core.PairingInfo
 import dev.keyrelay.core.PairingUri
 import dev.keyrelay.core.identityCode
@@ -141,6 +142,16 @@ private val FLY_Y = CubicBezierEasing(0.1f, 0.6f, 0.3f, 1f)
  * when a PC with the same key is already saved (re-pairing after the PC forgot this tablet).
  */
 internal fun pairedIdOf(result: PairResult): String? = (result as? PairResult.Paired)?.id
+
+/** The failure line of this pairing job's result; null on success. */
+internal fun pairFailRes(result: PairResult): Int? = when (result) {
+    is PairResult.Rejected ->
+        if (result.reason == Frame.Reject.PAIRING_NOT_ALLOWED_HERE) R.string.pair_not_allowed_here else R.string.pair_rejected
+    is PairResult.Unreachable -> R.string.pair_unreachable
+    PairResult.KeyMismatch -> R.string.pair_key_mismatch
+    PairResult.NotSaved -> R.string.pair_not_saved
+    is PairResult.Paired -> null
+}
 
 /** Wire pairs of the 4 x 2 code grid: the top row, the columns, then the bottom row. */
 internal val WIRES = listOf(0 to 1, 1 to 2, 2 to 3, 0 to 4, 1 to 5, 2 to 6, 3 to 7, 4 to 5, 5 to 6, 6 to 7)
@@ -198,13 +209,7 @@ fun PairConfirmDialog(info: PairingInfo, onDone: (paired: Boolean, pcId: String?
     val trailMeasure = remember { PathMeasure() }
     val trailDash = remember(density) { with(density) { PathEffect.dashPathEffect(floatArrayOf(4.dp.toPx(), 7.dp.toPx())) } }
 
-    fun pairFailText(r: PairResult) = when (r) {
-        is PairResult.Rejected -> context.getString(R.string.pair_rejected)
-        is PairResult.Unreachable -> context.getString(R.string.pair_unreachable)
-        PairResult.KeyMismatch -> context.getString(R.string.pair_key_mismatch)
-        PairResult.NotSaved -> context.getString(R.string.pair_not_saved)
-        is PairResult.Paired -> null
-    }
+    fun pairFailText(r: PairResult) = pairFailRes(r)?.let { context.getString(it) }
 
     /** Follows [job] to its end. [motion] false jumps every scene to its last frame (also used when re-attaching). */
     suspend fun follow(job: Deferred<PairResult>, motion: Boolean, foldIn: Boolean) = coroutineScope {

@@ -97,6 +97,7 @@
     <string name="pair_confirm_body">Yalnız bu QR kodu kendi PC\'nde açtıysan devam et.</string>
     <string name="pair_confirm">Eşleştir</string>
     <string name="pair_rejected">PC kodu kabul etmedi. Yeni bir QR kodu açıp tekrar dene.</string>
+    <string name="pair_not_allowed_here">Eşleştirme yalnız ev ağından ya da Tailscale açıkken yapılabilir. Tableti PC ile aynı Wi-Fi\'a bağla (misafir ağı değil) ya da Tailscale\'i aç, sonra tekrar dene; bu QR kodu hâlâ geçerli.</string>
     <string name="pair_unreachable">PC\'ye ulaşılamadı. PC\'nin açık ve KeyRelay\'in çalışır olduğuna bak; dışarıdaysan PC\'de dışarıdan erişim açık olmalı.</string>
     <string name="pair_key_mismatch">PC\'nin güvenlik kimliği bu QR koduyla uyuşmuyor. PC\'de yeni bir QR kodu aç.</string>
     <string name="pair_not_saved">Eşleşme bu tablete kaydedilemedi. PC\'de yeni bir QR kodu açıp tekrar dene.</string>

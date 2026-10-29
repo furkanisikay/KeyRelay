@@ -12,7 +12,16 @@ sealed interface Frame {
     class Paired(val deviceId: ByteArray, val token: ByteArray) : Frame
     class Hello(val version: Int, val deviceId: ByteArray, val token: ByteArray) : Frame
     class Welcome(val pcName: String) : Frame
-    class Reject(val reason: Int) : Frame
+    /** [reason] is read without a range check: an older app shows an unknown reason like any other reject. */
+    class Reject(val reason: Int) : Frame {
+        companion object {
+            const val VERSION = 1
+            const val UNKNOWN_DEVICE = 2
+            const val INVALID_CODE = 3
+            /** PAIR came through Funnel (from outside); pairing works only from the home network or Tailscale. */
+            const val PAIRING_NOT_ALLOWED_HERE = 4
+        }
+    }
     class Key(val code: Int, val value: Int) : Frame
     class State(val ready: Boolean) : Frame
     data object Sas : Frame

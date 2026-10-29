@@ -45,6 +45,9 @@ public enum RejectReason
     Version = 1,
     UnknownDevice = 2,
     InvalidCode = 3,
+
+    /// <summary>PAIR came over Funnel (loopback); pairing works only from the LAN or the tailnet.</summary>
+    PairingNotAllowedHere = 4,
 }
 
 /// <summary>A decoded frame. Payload and Raw point into the reader's buffer and stay valid until the next read.</summary>

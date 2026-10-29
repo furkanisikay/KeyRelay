@@ -136,7 +136,9 @@ internal sealed partial class RelayHub(RelayContext context, ILogger<RelayHub> l
         if (viaLoopback && !context.AllowLoopbackPairing)
         {
             if (SecurityLogAllowed()) LogPairFromLoopback(remote);
-            await ssl.WriteAsync(Frames.Reject(RejectReason.InvalidCode), cancellationToken).ConfigureAwait(false);
+            // Its own reason so the tablet can say "join the home Wi-Fi" instead of "wrong code"; older tablets show
+            // every PAIR reject the same way, so they need no special case.
+            await ssl.WriteAsync(Frames.Reject(RejectReason.PairingNotAllowedHere), cancellationToken).ConfigureAwait(false);
             return false;
         }
         var name = Pair(payload.Span, remote, out var reason);

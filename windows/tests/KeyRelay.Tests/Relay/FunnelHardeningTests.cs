@@ -33,7 +33,7 @@ public sealed class FunnelHardeningTests
         await tablet.SendAsync(Frames.Pair(code, "Tab"));
         var reject = await tablet.ExpectAsync(FrameType.Reject);
 
-        Assert.AreEqual((byte)RejectReason.InvalidCode, reject.Payload[0]);
+        Assert.AreEqual((byte)RejectReason.PairingNotAllowedHere, reject.Payload[0]);
         Assert.IsTrue(await tablet.IsClosedAsync());
         Assert.IsEmpty(harness.Devices.List());
         Assert.IsFalse(harness.Throttle.IsBlocked("127.0.0.1|pair"));
