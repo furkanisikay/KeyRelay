@@ -6,6 +6,11 @@ plugins {
 val appVersion = providers.fileContents(rootProject.layout.projectDirectory.file("../version.txt")).asText.get().trim()
 val (vMajor, vMinor, vPatch) = appVersion.split(".").map(String::toInt)
 require(vMinor < 100 && vPatch < 100) { "versionCode = major*10000 + minor*100 + patch needs minor and patch < 100" }
+// Android only installs an update signed with the same key (else INSTALL_FAILED_UPDATE_INCOMPATIBLE), so shipped APKs
+// use one shared key from these variables; without them the build falls back to this machine's own debug key.
+val signingKeystore = providers.environmentVariable("KEYRELAY_KEYSTORE").orNull
+val signingPassword = providers.environmentVariable("KEYRELAY_KEYSTORE_PASSWORD").orNull
+require(signingKeystore == null || !signingPassword.isNullOrEmpty()) { "KEYRELAY_KEYSTORE is set but KEYRELAY_KEYSTORE_PASSWORD is not" }
 android {
     namespace = "dev.keyrelay"
     compileSdk = 37
@@ -17,6 +22,17 @@ android {
         versionCode = vMajor * 10000 + vMinor * 100 + vPatch
         versionName = appVersion
         ndk { abiFilters += listOf("arm64-v8a") }
+    }
+    if (signingKeystore != null) {
+        // PKCS12 keystores use the store password for the key as well.
+        val shared = signingConfigs.create("shared") {
+            storeFile = file(signingKeystore)
+            storePassword = signingPassword
+            keyAlias = "keyrelay"
+            keyPassword = signingPassword
+        }
+        // Releases ship the debug build, so this is the build type that has to carry the shared key.
+        buildTypes.getByName("debug").signingConfig = shared
     }
     buildFeatures { compose = true; aidl = true }
     externalNativeBuild { cmake { path = file("src/main/cpp/CMakeLists.txt") } }

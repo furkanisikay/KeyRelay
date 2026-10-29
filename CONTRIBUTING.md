@@ -34,3 +34,28 @@ kurulum paketi oradan okur. Bu dosyayı ve `CHANGELOG.md`'yi elle değiştirme; 
 - Sürüm PR'ını merge etmek yayın demektir: etiket (`vX.Y.Z`) ve GitHub sürümü oluşur, kurulum paketi, zip ve APK
   aynı iş akışında derlenip sürüme yüklenir.
 - Belirli bir sürüme geçmek için (ör. 1.0.0) commit gövdesine `Release-As: 1.0.0` satırı ekle.
+
+## APK imza anahtarı
+
+Android bir güncellemeyi yalnızca önceki kurulumla aynı anahtarla imzalıysa kurar; aksi halde
+`INSTALL_FAILED_UPDATE_INCOMPATIBLE` verir ve uygulamayı kaldırıp sihirbazı ve PC eşleştirmesini baştan yapmak gerekir.
+Bu yüzden CI ve yayınlanan APK tek bir paylaşılan anahtarla imzalanır:
+
+- `KEYRELAY_KEYSTORE` (keystore dosyasının yolu) ve `KEYRELAY_KEYSTORE_PASSWORD` ortam değişkenleri varsa `app`
+  debug derlemesi bu anahtarla (takma ad `keyrelay`) imzalanır. Yoksa makinenin kendi debug anahtarı kullanılır; böyle
+  bir derleme yayınlanmış APK'nın üzerine kurulmaz (tersi de geçerli).
+- CI anahtarı `KEYRELAY_KEYSTORE_BASE64` ve `KEYRELAY_KEYSTORE_PASSWORD` GitHub secret'larından alır. Fork PR'larında
+  secret olmadığından debug anahtarına düşer; `release` iş akışı ise secret yoksa durur.
+- Keystore'u repoya koyma (`*.jks` yok sayılıyor) ve kopyasını parola yöneticisinde sakla: anahtar kaybolursa her
+  kullanıcı uygulamayı bir kez daha kaldırıp kurmak zorunda kalır.
+
+Anahtarı bir kez üretip secret'ları girmek için (PowerShell; parolayı `keytool` ve `gh` kendisi sorar):
+
+```powershell
+keytool -genkeypair -v -keystore "$HOME\keyrelay-signing.jks" -storetype PKCS12 -alias keyrelay -keyalg RSA -keysize 4096 -validity 36500 -dname "CN=KeyRelay"
+[Convert]::ToBase64String([IO.File]::ReadAllBytes("$HOME\keyrelay-signing.jks")) | gh secret set KEYRELAY_KEYSTORE_BASE64
+gh secret set KEYRELAY_KEYSTORE_PASSWORD
+```
+
+Yerelde de aynı anahtarla derlemek için `KEYRELAY_KEYSTORE` değişkenini bu dosyaya,
+`KEYRELAY_KEYSTORE_PASSWORD` değişkenini parolaya ayarla.

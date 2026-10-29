@@ -11,6 +11,15 @@ jobs:
       - uses: actions/setup-java@v6
         with: { distribution: temurin, java-version: "21" }
       - uses: gradle/actions/setup-gradle@v6
+      # Fork pull requests get no secrets; their APK falls back to the runner's debug key.
+      - name: Decode the signing key
+        env: { KEYSTORE_BASE64: "${{ secrets.KEYRELAY_KEYSTORE_BASE64 }}" }
+        run: |
+          if [ -n "$KEYSTORE_BASE64" ]; then
+            echo "$KEYSTORE_BASE64" | base64 -d > "$RUNNER_TEMP/keyrelay.jks"
+            echo "KEYRELAY_KEYSTORE=$RUNNER_TEMP/keyrelay.jks" >> "$GITHUB_ENV"
+          fi
       - run: ./gradlew test assembleDebug
+        env: { KEYRELAY_KEYSTORE_PASSWORD: "${{ secrets.KEYRELAY_KEYSTORE_PASSWORD }}" }
       - uses: actions/upload-artifact@v7
         with: { name: app-debug, path: android/app/build/outputs/apk/debug/app-debug.apk }

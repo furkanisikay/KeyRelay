@@ -43,6 +43,18 @@ write a version anywhere else.
 3. If `publish` fails, fix the cause, push the fix, then rerun the asset build for the existing tag:
    `gh workflow run release -f tag=vX.Y.Z` (uploads with `--clobber`).
 
+## APK signing key
+
+Android rejects an update signed with a different key (`INSTALL_FAILED_UPDATE_INCOMPATIBLE`), which forces an
+uninstall and a fresh wizard + PC pairing. So every published APK must carry the same key:
+
+- `android/app/build.gradle.kts` signs the debug build type (the one releases ship) with the keystore at
+  `KEYRELAY_KEYSTORE` (alias `keyrelay`, password `KEYRELAY_KEYSTORE_PASSWORD`). Without the variables it falls back
+  to the machine's own debug key, and such an APK cannot be installed over a release build.
+- Both workflows decode the `KEYRELAY_KEYSTORE_BASE64` secret into `$RUNNER_TEMP`. `android.yml` skips it when the
+  secret is empty (fork PRs); the `publish` job fails instead, so never "fix" it by removing that check.
+- The keystore never goes into the repository. Key generation and `gh secret set` commands are in `CONTRIBUTING.md`.
+
 ## CI notes
 
 - `dotnet test` must run from `windows/` so `global.json` selects the Microsoft.Testing.Platform runner.

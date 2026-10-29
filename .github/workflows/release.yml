@@ -39,7 +39,18 @@ jobs:
         working-directory: windows
       - run: ./installer/build.ps1
         shell: pwsh
+      # A release APK signed with any other key cannot be installed over the previous one.
+      - name: Decode the signing key
+        shell: pwsh
+        env:
+          KEYSTORE_BASE64: "${{ secrets.KEYRELAY_KEYSTORE_BASE64 }}"
+          KEYSTORE_PASSWORD: "${{ secrets.KEYRELAY_KEYSTORE_PASSWORD }}"
+        run: |
+          if (-not $env:KEYSTORE_BASE64 -or -not $env:KEYSTORE_PASSWORD) { throw "KEYRELAY_KEYSTORE_BASE64 and KEYRELAY_KEYSTORE_PASSWORD secrets must be set" }
+          [IO.File]::WriteAllBytes("$env:RUNNER_TEMP\keyrelay.jks", [Convert]::FromBase64String($env:KEYSTORE_BASE64))
+          "KEYRELAY_KEYSTORE=$env:RUNNER_TEMP\keyrelay.jks" >> $env:GITHUB_ENV
       - run: ./android/gradlew.bat -p android test assembleDebug
+        env: { KEYRELAY_KEYSTORE_PASSWORD: "${{ secrets.KEYRELAY_KEYSTORE_PASSWORD }}" }
       - name: Upload the release assets
         shell: pwsh
         env: { GH_TOKEN: "${{ github.token }}" }
