@@ -1,5 +1,13 @@
 # Changelog
 
+## [0.2.1](https://github.com/furkanisikay/KeyRelay/compare/v0.2.0...v0.2.1) (2026-10-29)
+
+
+### Bug Fixes
+
+* **android:** funnel üzerinden dışarıdan bağlantı zaman aşımına düşmüyor ([bc2fbe7](https://github.com/furkanisikay/KeyRelay/commit/bc2fbe760c32c1494d0cef5847848408446fdb4d))
+* **windows:** internete açık funnel adresi sertleştirildi ([5106ed1](https://github.com/furkanisikay/KeyRelay/commit/5106ed14539a06e1855d84aaf2e1c00638b90e2e))
+
 ## [0.2.0](https://github.com/furkanisikay/KeyRelay/compare/v0.1.0...v0.2.0) (2026-10-12)
 
 
